@@ -66,7 +66,7 @@ public class UserInfoController extends Controller {
 			userinfo.save();
 			renderJson(new Result(200, "save success", userinfo));
 		}
-		renderJson(new Result(0, "success", clientSession));
+		renderJson(new Result(200, "success", clientSession));
 	}
 
 	private String MD5(String s) {

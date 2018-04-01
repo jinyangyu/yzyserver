@@ -1,9 +1,12 @@
 package demo.bean;
 
+import java.util.Random;
+
 import com.jfinal.plugin.activerecord.Model;
 
 public class CollegeModel extends Model<CollegeModel> {
 	public static final CollegeModel dao = new CollegeModel().dao();
+	private static Random random = new Random(System.currentTimeMillis());;
 
 	private int id;
 	private String name;
@@ -38,6 +41,11 @@ public class CollegeModel extends Model<CollegeModel> {
 	private String li_2015;
 	private String li_2014;
 	private String li_2013;
+
+	// 非数据库字段
+	private boolean is211;
+	private boolean is985;
+	private String probability;
 
 	private static final String id_NAME = "id";
 	private static final String name_NAME = "name";
@@ -335,6 +343,37 @@ public class CollegeModel extends Model<CollegeModel> {
 
 	public void setLi_2013(String li_2013) {
 		this.li_2013 = li_2013;
+	}
+
+	public boolean isIs211() {
+		if (getCharacteristic() == null) {
+			return false;
+		}
+		return getCharacteristic().contains("211");
+	}
+
+	public void setIs211(boolean is211) {
+		this.is211 = is211;
+	}
+
+	public boolean isIs985() {
+		if (getCharacteristic() == null) {
+			return false;
+		}
+		return getCharacteristic().contains("985");
+	}
+
+	public void setIs985(boolean is985) {
+		this.is985 = is985;
+	}
+
+	public String getProbability() {
+
+		return String.valueOf(random.nextInt(100));
+	}
+
+	public void setProbability(String probability) {
+		this.probability = probability;
 	}
 
 }

@@ -9,6 +9,7 @@ import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 
 import controller.CollegePDFController;
+import controller.CollegeRecommendController;
 import controller.UserInfoController;
 import demo.bean.CollegeModel;
 import demo.bean.UserInfoModel;
@@ -32,6 +33,8 @@ public class DemoConfig extends JFinalConfig {
 		System.out.println("configRoute userinfo");
 		me.add("/mkpdf", CollegePDFController.class);
 		System.out.println("configRoute mkpdf");
+		me.add("/recommend", CollegeRecommendController.class);
+		System.out.println("configRoute collegeRecommend");
 	}
 
 	public void configEngine(Engine me) {

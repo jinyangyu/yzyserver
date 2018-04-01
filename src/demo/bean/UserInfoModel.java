@@ -16,6 +16,7 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	private String openid;
 	private String sessionKey;
 	private String clientSession;
+	private String pdfPath;
 
 	private static final String id_NAME = "id";
 	private static final String nickName_NAME = "nickName";
@@ -28,6 +29,7 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	private static final String openid_NAME = "openid";
 	private static final String sessionKey_NAME = "sessionKey";
 	private static final String clientSession_NAME = "clientSession";
+	private static final String pdfPath_NAME = "pdfPath";
 
 	public String getId() {
 		return id;
@@ -116,6 +118,14 @@ public class UserInfoModel extends Model<UserInfoModel> {
 
 	public void setClientSession(String clientSession) {
 		set(clientSession_NAME, clientSession);
+	}
+
+	public String getPdfPath() {
+		return getStr(pdfPath_NAME);
+	}
+
+	public void setPdfPath(String pdfPath) {
+		set(pdfPath_NAME, pdfPath);
 	}
 
 }

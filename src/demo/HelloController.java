@@ -12,7 +12,7 @@ public class HelloController extends Controller {
 		System.out.println("hello request");
 
 		System.out.println("select * from college");
-		List<CollegeModel> colleges = CollegeModel.dao.find("select * from college where id < 2");
+		List<CollegeModel> colleges = CollegeModel.dao.find("select * from college where id < 101 and id > 99");
 
 		for (CollegeModel model : colleges) {
 			String[] names = model._getAttrNames();
