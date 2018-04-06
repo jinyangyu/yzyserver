@@ -10,17 +10,24 @@ import com.jfinal.template.Engine;
 
 import controller.CollegePDFController;
 import controller.CollegeRecommendController;
+import controller.ExpertController;
+import controller.PaymentController;
+import controller.SmsController;
 import controller.UserInfoController;
+import controller.WXPayResultController;
+import datasource.DataSource;
 import demo.bean.CollegeModel;
+import demo.bean.SmsModel;
 import demo.bean.UserInfoModel;
+import demo.bean.WxOrderModel;
 
 public class DemoConfig extends JFinalConfig {
 	public void configConstant(Constants me) {
 		PropKit.use("project_config.txt");
-		
-		me.setDevMode(PropKit.getBoolean("devMode",false));
+
+		me.setDevMode(PropKit.getBoolean("devMode", false));
 		me.setEncoding(PropKit.get("encoding"));
-		
+
 		me.setJsonFactory(new FastJsonFactory());
 		me.setLogFactory(new Log4jLogFactory());
 	}
@@ -35,6 +42,14 @@ public class DemoConfig extends JFinalConfig {
 		System.out.println("configRoute mkpdf");
 		me.add("/recommend", CollegeRecommendController.class);
 		System.out.println("configRoute collegeRecommend");
+		me.add("/sms", SmsController.class);
+		System.out.println("configRoute SmsController");
+		me.add("/expert", ExpertController.class);
+		System.out.println("configRoute SmsController");
+		me.add("/pay", PaymentController.class);
+		System.out.println("configRoute PaymentController");
+		me.add("/wxpay", WXPayResultController.class);
+		System.out.println("configRoute WXPayResultController");
 	}
 
 	public void configEngine(Engine me) {
@@ -43,18 +58,17 @@ public class DemoConfig extends JFinalConfig {
 
 	public void configPlugin(Plugins me) {
 		System.out.println("configPlugin");
-		
-		DruidPlugin dp = new DruidPlugin(
-				PropKit.get("jdbcUrl"),
-				PropKit.get("user"), 
-				PropKit.get("password").trim());
+
+		DruidPlugin dp = new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim());
 		me.add(dp);
-		
+
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(dp);
 		me.add(arp);
-		
-		arp.addMapping("college",CollegeModel.class);
-		arp.addMapping("userinfo",UserInfoModel.class);
+
+		arp.addMapping("college", CollegeModel.class);
+		arp.addMapping("userinfo", UserInfoModel.class);
+		arp.addMapping("sms_verify", SmsModel.class);
+		arp.addMapping("orders", WxOrderModel.class);
 		arp.setShowSql(true);
 	}
 
@@ -64,5 +78,12 @@ public class DemoConfig extends JFinalConfig {
 
 	public void configHandler(Handlers me) {
 		System.out.println("configHandler");
+	}
+
+	@Override
+	public void afterJFinalStart() {
+		super.afterJFinalStart();
+		System.out.println("afterJFinalStart");
+		DataSource.getInstance();
 	}
 }

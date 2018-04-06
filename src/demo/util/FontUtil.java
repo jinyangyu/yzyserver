@@ -15,7 +15,7 @@ public class FontUtil {
 			return baseFont;
 		}
 		try {
-			baseFont = BaseFont.createFont("font/msyhbd.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			baseFont = BaseFont.createFont("../webapps/resources_yzy/font/msyhbd.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

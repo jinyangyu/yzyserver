@@ -1,5 +1,7 @@
 package controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.List;
 
@@ -9,6 +11,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.HttpKit;
 
+import constant.Configure;
+import constant.ResultCode;
 import demo.bean.UserInfoModel;
 import demo.result.Result;
 
@@ -19,16 +23,25 @@ public class UserInfoController extends Controller {
 		logger1.info("UserInfoController save");
 
 		String jsCode = getPara("js_code");
-		String loginInfo = getPara("loginInfo");
-
+		String loginInfo = "";
+		
+		
+		try {
+			loginInfo = URLDecoder.decode(getPara("loginInfo"),"UTF-8");
+			logger1.info("loginInfoUTF8:" + loginInfo);	
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		logger1.info("jsCode:" + jsCode);
 		logger1.info("loginInfo:" + loginInfo);
 
 		// {"session_key":"fa3BBl\/cf1Bv6WwLZgpb2w==","openid":"o4GPD5O_aVdtrrZJvDMQ-WL3hDUI"}
 		// openid 用户唯一标识
 		// session_key 会话密钥
-		String result = HttpKit.get("https://api.weixin.qq.com/sns/jscode2session?" + "appid=wx81bbb062bc23e921"
-				+ "&secret=a8c3a4d59d54555440457c6c871d1ca9" + "&js_code=" + jsCode + "&grant_type=authorization_code");
+		String result = HttpKit.get("https://api.weixin.qq.com/sns/jscode2session?" + "appid=" + Configure.getAppID()
+				+ "&secret=" + Configure.getSecret() + "&js_code=" + jsCode + "&grant_type=authorization_code");
 
 		logger1.info("https://api.weixin.qq.com/sns/jscode2session result:" + result);
 
@@ -58,15 +71,13 @@ public class UserInfoController extends Controller {
 			user.setClientSession(clientSession);
 
 			user.update();
-			renderJson(new Result(200, "update success", user));
 		} else {
 			userinfo.setOpenid(openid);
 			userinfo.setSessionKey(session_key);
 			userinfo.setClientSession(clientSession);
 			userinfo.save();
-			renderJson(new Result(200, "save success", userinfo));
 		}
-		renderJson(new Result(200, "success", clientSession));
+		renderJson(new Result(ResultCode.SUCCESS, "success", clientSession));
 	}
 
 	private String MD5(String s) {

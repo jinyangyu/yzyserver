@@ -20,6 +20,8 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.jfinal.core.Controller;
+
+import constant.ResultCode;
 import demo.bean.CollegeModel;
 import demo.bean.UserInfoModel;
 import demo.result.PdfResult;
@@ -29,7 +31,7 @@ import demo.util.FontUtil;
 public class CollegePDFController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegePDFController.class);
 	private static final String PDF_OUTPUT_PATH = "user_pdf_dir";
-
+	
 	private String userId = "YUJINYANG_001";
 	private long requestTime;
 
@@ -42,14 +44,14 @@ public class CollegePDFController extends Controller {
 		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where clientSession = ?",
 				clientSession);
 		if (users == null || users.isEmpty()) {
-			renderJson(new Result(201, "登陆信息失效", null));
+			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
 			return;
 		}
 		
 		UserInfoModel user = users.get(0);
 		
 		if(user.getPdfPath() != null && !"".equals(user.getPdfPath())) {
-			renderJson(new Result(203, "之前已经生成过pdf", new PdfResult(user.getPdfPath())));
+			renderJson(new Result(ResultCode.PDF_ERROR, "之前已经生成过pdf", new PdfResult(user.getPdfPath())));
 		}
 
 		requestTime = System.currentTimeMillis();
@@ -69,7 +71,7 @@ public class CollegePDFController extends Controller {
 
 			File tempPdfFile = File.createTempFile("tempPdfFile", ".pdf");
 			createPdfFile(tempPdfFile);
-			waterMark(tempPdfFile.getPath(), "image/yuzhiyuan.png", pdfFile.getPath(), "豫志愿-正版", 16);
+			waterMark(tempPdfFile.getPath(), "../webapps/resources_yzy/image/yuzhiyuan.png", pdfFile.getPath(), "豫志愿-正版", 16);
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -82,9 +84,9 @@ public class CollegePDFController extends Controller {
 			logger1.error("create pdf " + getPdfName() + " failed", e);
 		}
 		if (pdfFile != null) {
-			renderJson(new Result(200, "create success", new PdfResult(pdfFile.getPath())));
+			renderJson(new Result(ResultCode.SUCCESS, "create success", new PdfResult(pdfFile.getName())));
 		} else {
-			renderJson(new Result(202, "生成PDF失败", null));
+			renderJson(new Result(ResultCode.PDF_ERROR, "生成PDF失败,请稍后重试", null));
 		}
 	}
 
@@ -145,8 +147,12 @@ public class CollegePDFController extends Controller {
 	}
 
 	private File getPdfOutputFile() throws FileNotFoundException {
-		File pdfDir = new File(PDF_OUTPUT_PATH);
+		String pdfDirPath = "../webapps/yzyserver/" + PDF_OUTPUT_PATH;
+		
+		File pdfDir = new File(pdfDirPath);
+		logger1.info("pdf dir:" + pdfDir.getAbsolutePath());
 		if (!pdfDir.exists()) {
+			logger1.info("create pdf dir:" + pdfDir.getPath());
 			pdfDir.mkdir();
 		}
 		String pdfName = getPdfName();
@@ -225,5 +231,5 @@ public class CollegePDFController extends Controller {
 			e.printStackTrace();
 		}
 	}
-
+	
 }

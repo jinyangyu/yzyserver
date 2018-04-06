@@ -3,7 +3,6 @@ package demo.result;
 import java.util.List;
 
 import demo.bean.CollegeModel;
-import demo.bean.RankResult;
 
 public class CollegeResult {
 	

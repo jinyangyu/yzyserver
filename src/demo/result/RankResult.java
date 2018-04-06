@@ -1,4 +1,4 @@
-package demo.bean;
+package demo.result;
 
 public class RankResult {
 	public String year;

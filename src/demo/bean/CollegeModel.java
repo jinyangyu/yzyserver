@@ -6,7 +6,7 @@ import com.jfinal.plugin.activerecord.Model;
 
 public class CollegeModel extends Model<CollegeModel> {
 	public static final CollegeModel dao = new CollegeModel().dao();
-	private static Random random = new Random(System.currentTimeMillis());;
+	private static Random random = new Random(System.currentTimeMillis());
 
 	private int id;
 	private String name;
