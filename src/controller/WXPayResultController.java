@@ -44,10 +44,6 @@ public class WXPayResultController extends Controller {
 		xStream.alias("xml", WxPayResultInfo.class);
 		WxPayResultInfo payResultInfo = (WxPayResultInfo) xStream.fromXML(reqParams);
 
-		if (!"SUCCESS".equals(payResultInfo.getResult_code())) {
-			logger1.error("-------支付结果解析失败");
-		}
-
 		String resultSign;
 		try {
 			resultSign = Signature.checkSign(payResultInfo);
@@ -78,6 +74,22 @@ public class WXPayResultController extends Controller {
 			if (!order.getOpenid().equals(payResultInfo.getOpenid())) {
 				logger1.error(
 						"微信返回订单openid不一致 订单商户id：" + order.getOpenid() + " 微信支付openid：" + payResultInfo.getOpenid());
+			}
+
+			if (!"SUCCESS".equals(payResultInfo.getResult_code())) {
+				logger1.error("------- 支付结果为支付失败");
+			}
+
+			if (order.getTotal_fee() != payResultInfo.getTotal_fee()
+					|| !order.getMch_id().equals(payResultInfo.getMch_id())
+					|| !order.getOpenid().equals(payResultInfo.getOpenid())) {
+				return;
+			}
+
+			if (!"SUCCESS".equals(payResultInfo.getResult_code())) {
+				order.setStatusPayFailed();
+				order.update();
+				return;
 			}
 
 			order.setBank_type(payResultInfo.getBank_type());

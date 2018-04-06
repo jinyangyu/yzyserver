@@ -7,6 +7,9 @@ public class WxOrderModel extends Model<WxOrderModel> {
 
 	private String id;
 
+	// ----- 订单类型 院校推荐 || 专家辅导
+	private String payType;
+
 	// ----- 预下单发送字段
 	private String appid;
 	private String mch_id;
@@ -31,7 +34,14 @@ public class WxOrderModel extends Model<WxOrderModel> {
 	// ----- 状态字段
 	private String status;
 
+	// ----- 检查订单状态返回字段
+	private String trade_state;
+	private String trade_state_desc;
+
 	private static final String id_NAME = "id";
+
+	private static final String payType_NAME = "payType";
+
 	private static final String appid_NAME = "appid";
 	private static final String mch_id_NAME = "mch_id";
 	private static final String body_NAME = "body";
@@ -50,12 +60,43 @@ public class WxOrderModel extends Model<WxOrderModel> {
 	private static final String transaction_id_NAME = "transaction_id";
 	private static final String status_NAME = "status";
 
+	private static final String trade_state_NAME = "trade_state";
+	private static final String trade_state_desc_NAME = "trade_state_desc";
+
 	public String getId() {
 		return getStr(id_NAME);
 	}
 
 	public void setId(String id) {
 		set(id_NAME, id);
+	}
+
+	public String getTrade_state() {
+		return getStr(trade_state_NAME);
+	}
+
+	public void setTrade_state(String trade_status) {
+		set(trade_state_NAME, trade_status);
+	}
+
+	public String getTrade_state_desc() {
+		return getStr(trade_state_desc_NAME);
+	}
+
+	public void setTrade_state_desc(String trade_status_desc) {
+		set(trade_state_desc_NAME, trade_status_desc);
+	}
+
+	public String getPayType() {
+		return getStr(payType_NAME);
+	}
+
+	public void setPayTypeRecommend() {
+		set(payType_NAME, "RECOMMEND");
+	}
+
+	public void setPayTypeExpert() {
+		set(payType_NAME, "EXPERT");
 	}
 
 	public String getAppid() {

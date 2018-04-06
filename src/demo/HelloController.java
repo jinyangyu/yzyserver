@@ -19,7 +19,7 @@ public class HelloController extends Controller {
 		System.out.println("hello request");
 
 		System.out.println("select * from college");
-		List<CollegeModel> colleges = DataSource.getInstance().recommendCollege("",true);
+		List<CollegeModel> colleges = DataSource.getInstance().recommendCollege(100,true);
 
 		renderJson(new Result(200, "query success", colleges));
 	}

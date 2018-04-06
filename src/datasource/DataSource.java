@@ -14,49 +14,46 @@ public class DataSource {
 
 	private static DataSource dataSource = new DataSource();
 	private List<CollegeModel> allColleges;
-	
+
 	private IRecommendSource recommendSource_li;
 	private IRecommendSource recommendSource_wen;
 
 	private DataSource() {
 		logger1.info("DataSource init");
 		long start = System.currentTimeMillis();
-		allColleges = CollegeModel.dao.find("select * from college where id < 100");
+		allColleges = CollegeModel.dao.find("select * from college where id < 1000");
 		logger1.info("DataSource init colleges use:" + (System.currentTimeMillis() - start) + " ms");
 
 		start = System.currentTimeMillis();
-		
+
 		recommendSource_li = new LiRecommend();
 		recommendSource_wen = new WenRecommend();
-		
+
 		Collections.sort(allColleges, liComp);
 		recommendSource_li.setCollege(allColleges);
-		
+
 		Collections.sort(allColleges, wenComp);
 		recommendSource_wen.setCollege(allColleges);
-		
+
 		logger1.info("DataSource init colleges sort by li_2017 use:" + (System.currentTimeMillis() - start) + " ms");
 
-		for (int i = 0; i < 30; i++) {
-			System.out.println(allColleges.get(i).getName() + " li_2017:" + allColleges.get(i).getLi_2017());
-		}
 	}
-	
+
 	public static DataSource getInstance() {
 		return dataSource;
 	}
 
-	public List<CollegeModel> recommendCollege(String score,boolean isWen) {
-		if(isWen) {
+	public List<CollegeModel> recommendCollege(int score, boolean isWen) {
+		if (isWen) {
 			return recommendSource_wen.recommendCollege(score);
 		}
 		return recommendSource_li.recommendCollege(score);
 
-//		colleges = CollegeModel.dao.find("select * from college where id < 4");
-//		recommendCache.put(String.valueOf(score), colleges);
-//		return colleges;
+		// colleges = CollegeModel.dao.find("select * from college where id < 4");
+		// recommendCache.put(String.valueOf(score), colleges);
+		// return colleges;
 	}
-	
+
 	private Comparator liComp = new Comparator<CollegeModel>() {
 		public int compare(CollegeModel arg0, CollegeModel arg1) {
 			int li_2017_0 = 0;
@@ -73,7 +70,7 @@ public class DataSource {
 			return li_2017_1 - li_2017_0;
 		}
 	};
-	
+
 	private Comparator wenComp = new Comparator<CollegeModel>() {
 		public int compare(CollegeModel arg0, CollegeModel arg1) {
 			int wen_2017_0 = 0;

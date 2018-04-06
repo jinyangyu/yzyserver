@@ -48,17 +48,12 @@ public class PaymentController extends Controller {
 			return;
 		}
 
-		if (payType == PAY_FOR_RECOMMEND) {
-			String scoreStr = getPara("score");
-			int score = 0;
-			try {
-				score = Integer.parseInt(scoreStr);
-			} catch (Exception e) {
-				renderJson(new Result(ResultCode.LOGIN_ERROR, "查询分数参数错误", null));
-				return;
-			}
-		} else if (payType == PAY_FOR_EXPORT) {
+		wxOrderModel = new WxOrderModel();
 
+		if (payType == PAY_FOR_RECOMMEND) {
+			wxOrderModel.setPayTypeRecommend();
+		} else if (payType == PAY_FOR_EXPORT) {
+			wxOrderModel.setPayTypeExpert();
 		} else {
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "支付类型参数错误", null));
 			return;
@@ -84,6 +79,7 @@ public class PaymentController extends Controller {
 			result.setSignType("MD5");
 			result.setTimeStamp(String.valueOf(System.currentTimeMillis() / 1000));
 			result.setPackage_str("prepay_id=" + returnInfo.getPrepay_id());
+			result.setOut_trade_no(wxOrderModel.getOut_trade_no());
 
 			/*
 			 * paySign = MD5( appId=wxd678efh567hg6787
@@ -143,7 +139,6 @@ public class PaymentController extends Controller {
 			 * </xml>
 			 */
 
-			System.out.println(result);
 			logger1.info("---------下单返回:" + result);
 
 			XStream xStream = new XStream();
@@ -159,7 +154,6 @@ public class PaymentController extends Controller {
 					return null;
 				}
 
-				wxOrderModel = new WxOrderModel();
 				wxOrderModel.setAppid(order.getAppid());
 				wxOrderModel.setMch_id(order.getMch_id());
 				wxOrderModel.setBody(order.getBody());
@@ -177,5 +171,9 @@ public class PaymentController extends Controller {
 			logger1.error("-------", e);
 		}
 		return null;
+	}
+	
+	public void cancel() {
+		
 	}
 }

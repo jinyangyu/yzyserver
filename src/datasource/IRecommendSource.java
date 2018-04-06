@@ -7,6 +7,6 @@ import demo.bean.CollegeModel;
 public interface IRecommendSource {
 	
 	void setCollege(List<CollegeModel> colleges);
-	List<CollegeModel> recommendCollege(String score);
+	List<CollegeModel> recommendCollege(int score);
 
 }

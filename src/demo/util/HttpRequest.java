@@ -24,8 +24,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 
-import controller.PaymentController;
-
 public class HttpRequest {
 	public static Logger logger1 = Logger.getLogger(HttpRequest.class);
 	

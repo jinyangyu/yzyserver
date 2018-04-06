@@ -38,6 +38,25 @@ public class WxPayResultInfo {
 	private String attach;
 	private String time_end;
 
+	private String trade_state;
+	private String trade_state_desc;
+
+	public String getTrade_state() {
+		return trade_state;
+	}
+
+	public void setTrade_state(String trade_state) {
+		this.trade_state = trade_state;
+	}
+
+	public String getTrade_state_desc() {
+		return trade_state_desc;
+	}
+
+	public void setTrade_state_desc(String trade_state_desc) {
+		this.trade_state_desc = trade_state_desc;
+	}
+
 	public String getReturn_code() {
 		return return_code;
 	}
