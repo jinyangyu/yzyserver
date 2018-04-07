@@ -1,8 +1,8 @@
-package demo.result;
+package bean.requestresult;
 
 import java.util.List;
 
-import demo.bean.CollegeModel;
+import bean.dbmodel.CollegeModel;
 
 public class CollegeResult {
 	

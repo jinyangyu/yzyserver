@@ -1,4 +1,4 @@
-package demo;
+package jfinalconfig;
 
 import com.jfinal.config.*;
 import com.jfinal.json.FastJsonFactory;
@@ -8,20 +8,23 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 
+import bean.dbmodel.CollegeModel;
+import bean.dbmodel.SmsModel;
+import bean.dbmodel.UserInfoModel;
+import bean.dbmodel.WxPayOrderModel;
+import bean.dbmodel.YzyOrderModel;
 import controller.CollegePDFController;
 import controller.CollegeRecommendController;
 import controller.ExpertController;
+import controller.MyOrdersController;
 import controller.PaymentController;
 import controller.SmsController;
 import controller.UserInfoController;
 import controller.WXPayResultController;
 import datasource.DataSource;
-import demo.bean.CollegeModel;
-import demo.bean.SmsModel;
-import demo.bean.UserInfoModel;
-import demo.bean.WxOrderModel;
+import demo.HelloController;
 
-public class DemoConfig extends JFinalConfig {
+public class YzyConfig extends JFinalConfig {
 	public void configConstant(Constants me) {
 		PropKit.use("project_config.txt");
 
@@ -50,6 +53,8 @@ public class DemoConfig extends JFinalConfig {
 		System.out.println("configRoute PaymentController");
 		me.add("/wxpay", WXPayResultController.class);
 		System.out.println("configRoute WXPayResultController");
+		me.add("/myorders", MyOrdersController.class);
+		System.out.println("configRoute MyOrdersController");
 	}
 
 	public void configEngine(Engine me) {
@@ -68,7 +73,8 @@ public class DemoConfig extends JFinalConfig {
 		arp.addMapping("college", CollegeModel.class);
 		arp.addMapping("userinfo", UserInfoModel.class);
 		arp.addMapping("sms_verify", SmsModel.class);
-		arp.addMapping("orders", WxOrderModel.class);
+		arp.addMapping("orders_wxpay", WxPayOrderModel.class);
+		arp.addMapping("orders_yzy", YzyOrderModel.class);
 		arp.setShowSql(true);
 	}
 

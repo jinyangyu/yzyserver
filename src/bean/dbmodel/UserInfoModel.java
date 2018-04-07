@@ -1,4 +1,4 @@
-package demo.bean;
+package bean.dbmodel;
 
 import com.jfinal.plugin.activerecord.Model;
 
@@ -126,6 +126,14 @@ public class UserInfoModel extends Model<UserInfoModel> {
 
 	public void setPdfPath(String pdfPath) {
 		set(pdfPath_NAME, pdfPath);
+	}
+
+	@Override
+	public String toString() {
+		return "UserInfoModel [id=" + id + ", nickName=" + nickName + ", avatarUrl=" + avatarUrl + ", gender=" + gender
+				+ ", city=" + city + ", province=" + province + ", country=" + country + ", language=" + language
+				+ ", openid=" + openid + ", sessionKey=" + sessionKey + ", clientSession=" + clientSession
+				+ ", pdfPath=" + pdfPath + "]";
 	}
 
 }

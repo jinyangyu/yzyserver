@@ -1,4 +1,4 @@
-package demo.util;
+package util;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

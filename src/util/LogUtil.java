@@ -1,4 +1,4 @@
-package demo.util;
+package util;
 
 
 public class LogUtil {

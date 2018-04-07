@@ -21,12 +21,12 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.jfinal.core.Controller;
 
+import bean.dbmodel.CollegeModel;
+import bean.dbmodel.UserInfoModel;
+import bean.requestresult.PdfResult;
+import bean.requestresult.Result;
 import constant.ResultCode;
-import demo.bean.CollegeModel;
-import demo.bean.UserInfoModel;
-import demo.result.PdfResult;
-import demo.result.Result;
-import demo.util.FontUtil;
+import util.FontUtil;
 
 public class CollegePDFController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegePDFController.class);

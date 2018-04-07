@@ -7,11 +7,11 @@ import org.apache.log4j.Logger;
 
 import com.jfinal.core.Controller;
 
+import bean.dbmodel.SmsModel;
+import bean.dbmodel.UserInfoModel;
+import bean.requestresult.Result;
 import constant.ResultCode;
-import demo.bean.SmsModel;
-import demo.bean.UserInfoModel;
-import demo.result.Result;
-import demo.util.MobileUtil;
+import util.MobileUtil;
 
 public class SmsController extends Controller {
 	public static Logger logger1 = Logger.getLogger(SmsController.class);

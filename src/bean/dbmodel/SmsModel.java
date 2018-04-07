@@ -1,4 +1,4 @@
-package demo.bean;
+package bean.dbmodel;
 
 import com.jfinal.plugin.activerecord.Model;
 

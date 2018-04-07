@@ -1,4 +1,4 @@
-package demo.result;
+package bean.requestresult;
 
 public class RankResult {
 	public String year;

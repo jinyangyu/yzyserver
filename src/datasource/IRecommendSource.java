@@ -2,7 +2,7 @@ package datasource;
 
 import java.util.List;
 
-import demo.bean.CollegeModel;
+import bean.dbmodel.CollegeModel;
 
 public interface IRecommendSource {
 	

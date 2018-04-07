@@ -6,10 +6,10 @@ import org.apache.log4j.Logger;
 
 import com.jfinal.core.Controller;
 
+import bean.dbmodel.CollegeModel;
+import bean.requestresult.Result;
 import controller.CollegeRecommendController;
 import datasource.DataSource;
-import demo.bean.CollegeModel;
-import demo.result.Result;
 
 public class HelloController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegeRecommendController.class);

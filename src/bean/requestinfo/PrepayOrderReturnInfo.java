@@ -1,6 +1,6 @@
-package demo.bean;
+package bean.requestinfo;
 
-public class CheckOrderReturnInfo {
+public class PrepayOrderReturnInfo {
 	private String return_code;
 	private String return_msg;
 	private String result_code;

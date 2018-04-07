@@ -1,10 +1,10 @@
-package demo.bean;
+package bean.requestinfo;
 
 /**
  * 检查订单
  * 当微信支付结果未收到时使用
  */
-public class CheckOrderInfo {
+public class CheckPayOrderInfo {
 	private String appid;// 小程序ID
 	private String mch_id;// 商户号
 	private String transaction_id;// 微信的订单号，优先使用

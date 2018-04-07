@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;
 
-import demo.bean.WxOrderModel;
-import demo.bean.WxPayResultInfo;
-import demo.util.Signature;
-import demo.util.StreamUtil;
+import bean.dbmodel.WxPayOrderModel;
+import bean.requestinfo.WxPayResultInfo;
+import util.Signature;
+import util.StreamUtil;
 
 public class WXPayResultController extends Controller {
 	public static Logger logger1 = Logger.getLogger(WXPayResultController.class);
@@ -44,6 +44,8 @@ public class WXPayResultController extends Controller {
 		xStream.alias("xml", WxPayResultInfo.class);
 		WxPayResultInfo payResultInfo = (WxPayResultInfo) xStream.fromXML(reqParams);
 
+		logger1.info("-------支付结果Info:" + payResultInfo);
+
 		String resultSign;
 		try {
 			resultSign = Signature.checkSign(payResultInfo);
@@ -56,14 +58,15 @@ public class WXPayResultController extends Controller {
 			e.printStackTrace();
 		}
 
-		List<WxOrderModel> orders = WxOrderModel.dao.find("select * from orders where openid = ? and out_trade_no = ?",
-				payResultInfo.getOpenid(), payResultInfo.getOut_trade_no());
+		List<WxPayOrderModel> orders = WxPayOrderModel.dao.find(
+				"select * from orders_wxpay where openid = ? and out_trade_no = ?", payResultInfo.getOpenid(),
+				payResultInfo.getOut_trade_no());
 
 		if (orders == null || orders.size() != 1) {
 			logger1.error("微信返回订单在本地数据库下单信息中查不到 数据库订单：" + orders);
 		} else {
 			logger1.info("校验支付信息是否一致");
-			WxOrderModel order = orders.get(0);
+			WxPayOrderModel order = orders.get(0);
 			if (order.getTotal_fee() != payResultInfo.getTotal_fee()) {
 				logger1.error("微信返回订单与数据库下单 支付金额不一致 数据库金额：" + order.getTotal_fee() + " 微信支付金额："
 						+ payResultInfo.getTotal_fee());
@@ -77,18 +80,16 @@ public class WXPayResultController extends Controller {
 			}
 
 			if (!"SUCCESS".equals(payResultInfo.getResult_code())) {
+				order.setStatusPayFailed();
+				order.update();
 				logger1.error("------- 支付结果为支付失败");
 			}
 
 			if (order.getTotal_fee() != payResultInfo.getTotal_fee()
 					|| !order.getMch_id().equals(payResultInfo.getMch_id())
 					|| !order.getOpenid().equals(payResultInfo.getOpenid())) {
-				return;
-			}
-
-			if (!"SUCCESS".equals(payResultInfo.getResult_code())) {
-				order.setStatusPayFailed();
-				order.update();
+				
+				logger1.error("------- 支付信息与本地不一致");
 				return;
 			}
 
@@ -97,12 +98,13 @@ public class WXPayResultController extends Controller {
 			order.setIs_subscribe(payResultInfo.getIs_subscribe());
 			order.setTime_end(payResultInfo.getTime_end());
 			order.setTransaction_id(payResultInfo.getTransaction_id());
+			logger1.info("------- 支付结果payResultInfo.getTransaction_id()：" + payResultInfo.getTransaction_id());
 
 			order.setStatusPaySuccess();
+
+			logger1.info("update order:" + order.toString() + " \n===========in to databases");
 			order.update();
 		}
-
-		logger1.info("-------支付结果Info:" + payResultInfo);
 
 		StringBuffer sb = new StringBuffer("<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>");
 

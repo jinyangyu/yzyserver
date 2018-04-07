@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import demo.bean.CollegeModel;
+import bean.dbmodel.CollegeModel;
 
 public class RecommendUtil {
 	public static Logger logger1 = Logger.getLogger(RecommendUtil.class);

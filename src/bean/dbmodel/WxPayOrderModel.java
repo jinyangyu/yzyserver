@@ -1,9 +1,9 @@
-package demo.bean;
+package bean.dbmodel;
 
 import com.jfinal.plugin.activerecord.Model;
 
-public class WxOrderModel extends Model<WxOrderModel> {
-	public static final WxOrderModel dao = new WxOrderModel().dao();
+public class WxPayOrderModel extends Model<WxPayOrderModel> {
+	public static final WxPayOrderModel dao = new WxPayOrderModel().dao();
 
 	private String id;
 
@@ -239,4 +239,16 @@ public class WxOrderModel extends Model<WxOrderModel> {
 		set(status_NAME, "PAY_Failed");
 	}
 
+	@Override
+	public String toString() {
+		return "WxPayOrderModel [id=" + id + ", payType=" + payType + ", appid=" + appid + ", mch_id=" + mch_id
+				+ ", body=" + body + ", out_trade_no=" + out_trade_no + ", total_fee=" + total_fee
+				+ ", spbill_create_ip=" + spbill_create_ip + ", notify_url=" + notify_url + ", trade_type=" + trade_type
+				+ ", openid=" + openid + ", prepay_id=" + prepay_id + ", bank_type=" + bank_type + ", fee_type="
+				+ fee_type + ", is_subscribe=" + is_subscribe + ", time_end=" + time_end + ", transaction_id="
+				+ transaction_id + ", status=" + status + ", trade_state=" + trade_state + ", trade_state_desc="
+				+ trade_state_desc + "]";
+	}
+
+	
 }

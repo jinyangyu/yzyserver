@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import bean.dbmodel.CollegeModel;
 import controller.CollegeRecommendController;
-import demo.bean.CollegeModel;
 
 public class DataSource {
 	public static Logger logger1 = Logger.getLogger(CollegeRecommendController.class);

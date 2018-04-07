@@ -1,10 +1,10 @@
-package demo.bean;
+package bean.requestinfo;
 
 /**
  * 预订单
  * 
  */
-public class OrderInfo {
+public class PrepayOrderInfo {
 	private String appid;// 小程序ID	
 	private String mch_id;// 商户号
 	private String nonce_str;// 随机字符串

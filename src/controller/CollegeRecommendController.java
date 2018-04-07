@@ -14,30 +14,32 @@ import org.apache.log4j.Logger;
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;
 
+import bean.dbmodel.CollegeModel;
+import bean.dbmodel.UserInfoModel;
+import bean.dbmodel.WxPayOrderModel;
+import bean.dbmodel.YzyOrderModel;
+import bean.requestinfo.CheckPayOrderInfo;
+import bean.requestinfo.WxPayResultInfo;
+import bean.requestresult.CollegeResult;
+import bean.requestresult.RankResult;
+import bean.requestresult.Result;
 import constant.Configure;
 import constant.ResultCode;
 import datasource.DataSource;
-import demo.bean.CheckOrderInfo;
-import demo.bean.CollegeModel;
-import demo.bean.UserInfoModel;
-import demo.bean.WxOrderModel;
-import demo.bean.WxPayResultInfo;
-import demo.result.CollegeResult;
-import demo.result.RankResult;
-import demo.result.Result;
-import demo.util.HttpRequest;
-import demo.util.RandomStringGenerator;
-import demo.util.Signature;
+import util.HttpRequest;
+import util.RandomStringGenerator;
+import util.Signature;
 
 public class CollegeRecommendController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegeRecommendController.class);
+	private String subject;
 
 	public void recommend() {
 
 		logger1.info("CollegeRecommendController recommend");
 
 		String scoreStr = getPara("score");
-		String subject = getPara("subject");
+		subject = getPara("subject");
 		String clientSession = getPara("clientSession");
 		String out_trade_no = getPara("out_trade_no");
 
@@ -73,27 +75,53 @@ public class CollegeRecommendController extends Controller {
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
 			return;
 		}
+		UserInfoModel user = users.get(0);
+		logger1.info("user:" + user.getNickName() + " openId:" + user.getOpenid());
 
-		List<WxOrderModel> orders = WxOrderModel.dao.find("select * from orders where out_trade_no = ?", out_trade_no);
-		if (orders == null || orders.isEmpty()) {
+		if ("".equals(user.getOpenid())) {
+			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
+			return;
+		}
+
+		List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find(
+				"select * from orders_yzy where out_trade_no = ? and type = 1 and openid = ?", out_trade_no,
+				user.getOpenid());
+		if (yzyOrders != null && yzyOrders.size() != 0 && yzyOrders.get(0).getOut_trade_no() != null
+				&& !"".equals(yzyOrders.get(0).getOut_trade_no()) && score == yzyOrders.get(0).getScore()
+				&& subject.equals(yzyOrders.get(0).getSubject())) {
+			// 2、检查订单数据，如果是已存在完成的订单，则直接查询。
+			doRecommendByScore(score, isWen);
+
+			yzyOrders.get(0).setTime(String.valueOf(System.currentTimeMillis()));
+			yzyOrders.get(0).update();
+		} else {
+			// 1、新订单，检查支付结果
+			startRecommendByCheckWxOrder(out_trade_no, user, score, isWen);
+		}
+	}
+
+	private void startRecommendByCheckWxOrder(String out_trade_no, UserInfoModel user, int score, boolean isWen) {
+		List<WxPayOrderModel> wxOrders = WxPayOrderModel.dao.find("select * from orders_wxpay where out_trade_no = ?",
+				out_trade_no);
+		if (wxOrders == null || wxOrders.isEmpty()) {
 			renderJson(new Result(ResultCode.PREPAY_ERROR, "没有查到订单信息", null));
 			return;
 		}
 
-		if (orders.size() != 1) {
+		if (wxOrders.size() != 1) {
 			renderJson(new Result(ResultCode.PREPAY_ERROR, "有多条订单信息", null));
 			return;
 		}
 
-		WxOrderModel order = orders.get(0);
+		WxPayOrderModel wxOrder = wxOrders.get(0);
 
-		if ("SUCCESS".equals(order.getTrade_state())) {
+		if ("SUCCESS".equals(wxOrder.getTrade_state())) {
 			// trade_state 已为 SUCCESS，说明已经手动检查过，本次请求从我的订单发起。
 		} else {
 
 			// 手动检查支付结果。
 			try {
-				if (checkWxOrder(order)) {
+				if (checkWxOrder(wxOrder)) {
 				} else {
 					return;
 				}
@@ -101,30 +129,23 @@ public class CollegeRecommendController extends Controller {
 				e.printStackTrace();
 			}
 		}
-
-		// 已成功支付,否则 checkWxOrder 中会返回 false 
-		UserInfoModel user = users.get(0);
-		logger1.info("user:" + user.getNickName());
-
-		List<CollegeModel> colleges = DataSource.getInstance().recommendCollege(score, true);
-
-		CollegeResult collegeResult = new CollegeResult();
-		collegeResult.setColleges(colleges);
-		List<RankResult> ranks = new ArrayList<RankResult>();
-		ranks.add(new RankResult("2017", "102017"));
-		ranks.add(new RankResult("2016", "202016"));
-		ranks.add(new RankResult("2015", "302015"));
-		collegeResult.setRanks(ranks);
-
-		renderJson(new Result(ResultCode.SUCCESS, "query success", collegeResult));
+		YzyOrderModel yzyOrder = new YzyOrderModel();
+		yzyOrder.setOut_trade_no(out_trade_no);
+		yzyOrder.setScore(score);
+		yzyOrder.setOpenid(user.getOpenid());
+		yzyOrder.setSubject(subject);
+		yzyOrder.setTime(String.valueOf(System.currentTimeMillis()));
+		yzyOrder.setRecommendType();
+		yzyOrder.save();
+		doRecommendByScore(score, isWen);
 	}
 
-	private boolean checkWxOrder(WxOrderModel order) throws IllegalAccessException, UnrecoverableKeyException,
+	private boolean checkWxOrder(WxPayOrderModel order) throws IllegalAccessException, UnrecoverableKeyException,
 			KeyManagementException, ClientProtocolException, KeyStoreException, NoSuchAlgorithmException, IOException {
 
 		boolean checkResult = false;
 
-		CheckOrderInfo orderInfo = new CheckOrderInfo();
+		CheckPayOrderInfo orderInfo = new CheckPayOrderInfo();
 		orderInfo.setAppid(Configure.getAppID());
 		orderInfo.setMch_id(Configure.getMch_id());
 		if (order.getTransaction_id() != null && !"".equals(order.getTransaction_id())) {
@@ -202,6 +223,20 @@ public class CollegeRecommendController extends Controller {
 			checkResult = true;
 		}
 		return checkResult;
+	}
+
+	private void doRecommendByScore(int score, boolean isWen) {
+		List<CollegeModel> colleges = DataSource.getInstance().recommendCollege(score, isWen);
+
+		CollegeResult collegeResult = new CollegeResult();
+		collegeResult.setColleges(colleges);
+		List<RankResult> ranks = new ArrayList<RankResult>();
+		ranks.add(new RankResult("2017", "102017"));
+		ranks.add(new RankResult("2016", "202016"));
+		ranks.add(new RankResult("2015", "302015"));
+		collegeResult.setRanks(ranks);
+
+		renderJson(new Result(ResultCode.SUCCESS, "query success", collegeResult));
 	}
 
 }

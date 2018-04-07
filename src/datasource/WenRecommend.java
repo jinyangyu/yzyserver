@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import demo.bean.CollegeModel;
+import bean.dbmodel.CollegeModel;
 
 public class WenRecommend implements IRecommendSource {
 

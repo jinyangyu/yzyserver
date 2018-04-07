@@ -1,4 +1,4 @@
-package demo.result;
+package bean.requestresult;
 
 public class Result {
 	private int result_code;

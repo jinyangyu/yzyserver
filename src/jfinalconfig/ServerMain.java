@@ -1,4 +1,4 @@
-package demo;
+package jfinalconfig;
 
 import com.jfinal.core.JFinal;
 

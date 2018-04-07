@@ -1,4 +1,4 @@
-package demo.bean;
+package bean.dbmodel;
 
 import java.util.Random;
 

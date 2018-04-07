@@ -5,10 +5,10 @@ import org.apache.log4j.Logger;
 
 import com.jfinal.core.Controller;
 
+import bean.dbmodel.SmsModel;
+import bean.dbmodel.UserInfoModel;
+import bean.requestresult.Result;
 import constant.ResultCode;
-import demo.bean.SmsModel;
-import demo.bean.UserInfoModel;
-import demo.result.Result;
 
 public class ExpertController extends Controller {
 	public static Logger logger1 = Logger.getLogger(ExpertController.class);

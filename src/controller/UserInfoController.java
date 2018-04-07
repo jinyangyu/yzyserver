@@ -11,10 +11,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.HttpKit;
 
+import bean.dbmodel.UserInfoModel;
+import bean.requestresult.Result;
 import constant.Configure;
 import constant.ResultCode;
-import demo.bean.UserInfoModel;
-import demo.result.Result;
 
 public class UserInfoController extends Controller {
 	public static Logger logger1 = Logger.getLogger(UserInfoController.class);
@@ -70,11 +70,14 @@ public class UserInfoController extends Controller {
 			user.setSessionKey(session_key);
 			user.setClientSession(clientSession);
 
+			logger1.info("user update:" + user.toString());	
 			user.update();
 		} else {
 			userinfo.setOpenid(openid);
 			userinfo.setSessionKey(session_key);
 			userinfo.setClientSession(clientSession);
+			
+			logger1.info("user update:" + userinfo.toString());
 			userinfo.save();
 		}
 		renderJson(new Result(ResultCode.SUCCESS, "success", clientSession));

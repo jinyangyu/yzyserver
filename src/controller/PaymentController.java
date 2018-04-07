@@ -5,18 +5,19 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;
+
+import bean.dbmodel.UserInfoModel;
+import bean.dbmodel.WxPayOrderModel;
+import bean.requestinfo.PrepayOrderInfo;
+import bean.requestinfo.PrepayOrderReturnInfo;
+import bean.requestresult.PrepayResult;
+import bean.requestresult.Result;
 import constant.Configure;
 import constant.ResultCode;
-import demo.bean.OrderInfo;
-import demo.bean.OrderReturnInfo;
-import demo.bean.UserInfoModel;
-import demo.bean.WxOrderModel;
-import demo.result.PrepayResult;
-import demo.result.Result;
-import demo.util.HttpRequest;
-import demo.util.MD5;
-import demo.util.RandomStringGenerator;
-import demo.util.Signature;
+import util.HttpRequest;
+import util.MD5;
+import util.RandomStringGenerator;
+import util.Signature;
 
 public class PaymentController extends Controller {
 	public static Logger logger1 = Logger.getLogger(PaymentController.class);
@@ -25,7 +26,7 @@ public class PaymentController extends Controller {
 	private static final int PAY_FOR_EXPORT = 2; // 专家预约订单
 	private UserInfoModel currentUser;
 
-	private WxOrderModel wxOrderModel;
+	private WxPayOrderModel wxOrderModel;
 
 	public void recommend() {
 
@@ -35,6 +36,7 @@ public class PaymentController extends Controller {
 		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where clientSession = ?",
 				clientSession);
 		if (users == null || users.isEmpty()) {
+			logger1.info("clientSession:" + clientSession + " 登陆信息失效");
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
 			return;
 		}
@@ -48,7 +50,7 @@ public class PaymentController extends Controller {
 			return;
 		}
 
-		wxOrderModel = new WxOrderModel();
+		wxOrderModel = new WxPayOrderModel();
 
 		if (payType == PAY_FOR_RECOMMEND) {
 			wxOrderModel.setPayTypeRecommend();
@@ -70,7 +72,7 @@ public class PaymentController extends Controller {
 		 * <prepay_id><![CDATA[wx062046307543307844008c4f0594606674]]></prepay_id>
 		 * <trade_type><![CDATA[JSAPI]]></trade_type> </xml>
 		 */
-		OrderReturnInfo returnInfo = requestWXPreOrder();
+		PrepayOrderReturnInfo returnInfo = requestWXPreOrder();
 
 		if (returnInfo != null) {
 			// 返回前端需要的下单参数.
@@ -105,10 +107,10 @@ public class PaymentController extends Controller {
 		}
 	}
 
-	private OrderReturnInfo requestWXPreOrder() {
+	private PrepayOrderReturnInfo requestWXPreOrder() {
 		try {
 			String openid = currentUser.getOpenid();
-			OrderInfo order = new OrderInfo();
+			PrepayOrderInfo order = new PrepayOrderInfo();
 			order.setAppid(Configure.getAppID());
 			order.setMch_id(Configure.getMch_id());
 			order.setNonce_str(RandomStringGenerator.getRandomStringByLength(32));
@@ -142,8 +144,8 @@ public class PaymentController extends Controller {
 			logger1.info("---------下单返回:" + result);
 
 			XStream xStream = new XStream();
-			xStream.alias("xml", OrderReturnInfo.class);
-			OrderReturnInfo returnInfo = (OrderReturnInfo) xStream.fromXML(result);
+			xStream.alias("xml", PrepayOrderReturnInfo.class);
+			PrepayOrderReturnInfo returnInfo = (PrepayOrderReturnInfo) xStream.fromXML(result);
 
 			if (returnInfo != null) {
 				String resultSign = Signature.checkSign(returnInfo);

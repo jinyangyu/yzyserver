@@ -1,4 +1,4 @@
-package demo.bean;
+package bean.requestinfo;
 
 public class WxPayResultInfo {
 	private String return_code;
