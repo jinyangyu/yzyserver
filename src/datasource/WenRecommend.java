@@ -44,10 +44,12 @@ public class WenRecommend implements IRecommendSource {
 		return results;
 	}
 	
-	public void clearCache() {
+	public String clearCache() {
+		int size = recommendCache.size();
 		if(recommendCache != null) {
 			recommendCache.clear();
 		}
+		return "文科推荐数据，已清空 " + size + " 条缓存\n";
 	}
 
 }

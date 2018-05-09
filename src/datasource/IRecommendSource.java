@@ -8,6 +8,6 @@ public interface IRecommendSource {
 	
 	void setCollege(List<CollegeModel> colleges);
 	List<CollegeModel> recommendCollege(int score);
-	void clearCache();
+	String clearCache();
 
 }

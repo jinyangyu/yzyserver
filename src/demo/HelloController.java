@@ -174,7 +174,7 @@ public class HelloController extends Controller {
 	}
 	
 	public void clearRecommendCache() {
-		DataSource.getInstance().clearRecommendCache();
+		renderHtml(DataSource.getInstance().clearRecommendCache());
 	}
 
 }

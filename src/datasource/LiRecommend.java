@@ -37,10 +37,12 @@ public class LiRecommend implements IRecommendSource {
 		return results;
 	}
 
-	public void clearCache() {
+	public String clearCache() {
+		int size = recommendCache.size();
 		if(recommendCache != null) {
 			recommendCache.clear();
 		}
+		return "理科推荐数据，已清空 " + size + " 条缓存\n";
 	}
 	
 }

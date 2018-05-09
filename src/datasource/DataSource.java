@@ -198,9 +198,13 @@ public class DataSource {
 		}
 	};
 	
-	public void clearRecommendCache() {
-		recommendSource_li.clearCache();
-		recommendSource_wen.clearCache();
+	public String clearRecommendCache() {
+		String result_li = recommendSource_li.clearCache();
+		String result_wen = recommendSource_wen.clearCache();
+		
+		String result_cache = ChanceUtil.clearChanceCache();
+		
+		return "<br>" + result_li + "</br>" + "<br>" + result_wen + "</br>" + "<br>" + result_cache + "</br>";
 	}
 
 }

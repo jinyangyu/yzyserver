@@ -16,7 +16,8 @@ public class ChanceUtil {
 		List<CollegeChanceResult> chanceResultList = new ArrayList<CollegeChanceResult>();
 
 		String key = score + "_" + isWen;
-		ChanceCacheModel chanceCache = ChanceCacheModel.dao.findFirst("select * from chance_cache where cacheKey = ?", key);
+		ChanceCacheModel chanceCache = ChanceCacheModel.dao.findFirst("select * from chance_cache where cacheKey = ?",
+				key);
 
 		if (chanceCache == null) {
 
@@ -37,30 +38,30 @@ public class ChanceUtil {
 				// 6-10 40%-60%
 				// 11-15 60%-80%
 				// 15-20 80%-90%
-				
-				if(diff == -1) {
+
+				if (diff == -1) {
 					chanceResult.setChance(75 + random.nextInt(5));
 				}
-				if(diff == -2) {
+				if (diff == -2) {
 					chanceResult.setChance(70 + random.nextInt(4));
 				}
-				if(diff == -3) {
+				if (diff == -3) {
 					chanceResult.setChance(60 + random.nextInt(10));
 				}
-				if(diff == -4) {
+				if (diff == -4) {
 					chanceResult.setChance(50 + random.nextInt(10));
 				}
-				if(diff == -5) {
+				if (diff == -5) {
 					chanceResult.setChance(40 + random.nextInt(10));
 				}
-				
-				if(diff >= 0 && diff <= 20) {
+
+				if (diff >= 0 && diff <= 20) {
 					chanceResult.setChance(88 + diff / 2);
 				}
-				if(diff >20) {
+				if (diff > 20) {
 					chanceResult.setChance(99);
 				}
-				
+
 				sb.append(chanceResult.getChance());
 				if (i != colleges_all.size() - 1) {
 					sb.append(",");
@@ -97,7 +98,7 @@ public class ChanceUtil {
 				}
 			}
 		}
-		
+
 		return chanceResultList;
 	}
 
@@ -106,6 +107,17 @@ public class ChanceUtil {
 		if (chanceCache != null) {
 			chanceCache.delete();
 		}
+	}
+
+	public static String clearChanceCache() {
+		List<ChanceCacheModel> caches = ChanceCacheModel.dao.find("select * from chance_cache");
+		int size = caches.size();
+		for (ChanceCacheModel cache : caches) {
+			if (cache != null) {
+				cache.delete();
+			}
+		}
+		return "院校概率数据，已清空 " + size + " 条数据库缓存\n";
 	}
 
 }
