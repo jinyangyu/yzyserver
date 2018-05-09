@@ -2,13 +2,28 @@ package bean.requestresult;
 
 import java.util.List;
 
-import bean.dbmodel.CollegeModel;
-
 public class CollegeResult {
-	
 	public List<RankResult> ranks;
-	
-	public List<CollegeModel> colleges;
+	public List<CollegeChanceResult> colleges;
+
+	public int totalPage;
+	public int totalSize;
+
+	public int getTotalSize() {
+		return totalSize;
+	}
+
+	public void setTotalSize(int totalSize) {
+		this.totalSize = totalSize;
+	}
+
+	public int getTotalPage() {
+		return totalPage;
+	}
+
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
 
 	public List<RankResult> getRanks() {
 		return ranks;
@@ -18,11 +33,11 @@ public class CollegeResult {
 		this.ranks = ranks;
 	}
 
-	public List<CollegeModel> getColleges() {
+	public List<CollegeChanceResult> getColleges() {
 		return colleges;
 	}
 
-	public void setColleges(List<CollegeModel> colleges) {
+	public void setColleges(List<CollegeChanceResult> colleges) {
 		this.colleges = colleges;
 	}
 

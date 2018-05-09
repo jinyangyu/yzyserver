@@ -8,14 +8,17 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 
+import bean.dbmodel.ChanceCacheModel;
 import bean.dbmodel.CollegeModel;
+import bean.dbmodel.ScoreRankModel;
 import bean.dbmodel.SmsModel;
 import bean.dbmodel.UserInfoModel;
 import bean.dbmodel.WxPayOrderModel;
 import bean.dbmodel.YzyOrderModel;
 import controller.CollegePDFController;
 import controller.CollegeRecommendController;
-import controller.ExpertController;
+import controller.SmsVerifyController;
+import controller.ExpertPaySuccessController;
 import controller.MyOrdersController;
 import controller.PaymentController;
 import controller.SmsController;
@@ -47,7 +50,7 @@ public class YzyConfig extends JFinalConfig {
 		System.out.println("configRoute collegeRecommend");
 		me.add("/sms", SmsController.class);
 		System.out.println("configRoute SmsController");
-		me.add("/expert", ExpertController.class);
+		me.add("/smsverify", SmsVerifyController.class);
 		System.out.println("configRoute SmsController");
 		me.add("/pay", PaymentController.class);
 		System.out.println("configRoute PaymentController");
@@ -55,6 +58,8 @@ public class YzyConfig extends JFinalConfig {
 		System.out.println("configRoute WXPayResultController");
 		me.add("/myorders", MyOrdersController.class);
 		System.out.println("configRoute MyOrdersController");
+		me.add("/expertpaysuccess", ExpertPaySuccessController.class);
+		System.out.println("configRoute ExpertPaySuccessController");
 	}
 
 	public void configEngine(Engine me) {
@@ -65,6 +70,7 @@ public class YzyConfig extends JFinalConfig {
 		System.out.println("configPlugin");
 
 		DruidPlugin dp = new DruidPlugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim());
+		
 		me.add(dp);
 
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(dp);
@@ -75,6 +81,8 @@ public class YzyConfig extends JFinalConfig {
 		arp.addMapping("sms_verify", SmsModel.class);
 		arp.addMapping("orders_wxpay", WxPayOrderModel.class);
 		arp.addMapping("orders_yzy", YzyOrderModel.class);
+		arp.addMapping("scores", ScoreRankModel.class);
+		arp.addMapping("chance_cache", ChanceCacheModel.class);
 		arp.setShowSql(true);
 	}
 

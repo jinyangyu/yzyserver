@@ -10,8 +10,8 @@ import bean.dbmodel.UserInfoModel;
 import bean.requestresult.Result;
 import constant.ResultCode;
 
-public class ExpertController extends Controller {
-	public static Logger logger1 = Logger.getLogger(ExpertController.class);
+public class SmsVerifyController extends Controller {
+	public static Logger logger1 = Logger.getLogger(SmsVerifyController.class);
 
 	public void order() {
 
@@ -66,9 +66,5 @@ public class ExpertController extends Controller {
 
 		logger1.info("验证码正确,发起预约订单");
 		renderJson(new Result(ResultCode.SUCCESS, "验证码正确,发起预约订单", null));
-	}
-
-	public static void main(String[] args) {
-		System.out.println(System.currentTimeMillis());
 	}
 }

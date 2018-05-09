@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import com.aliyuncs.exceptions.ClientException;
 import com.jfinal.core.Controller;
 
 import bean.dbmodel.SmsModel;
@@ -12,6 +13,7 @@ import bean.dbmodel.UserInfoModel;
 import bean.requestresult.Result;
 import constant.ResultCode;
 import util.MobileUtil;
+import util.sms.SmsUtil;
 
 public class SmsController extends Controller {
 	public static Logger logger1 = Logger.getLogger(SmsController.class);
@@ -36,7 +38,7 @@ public class SmsController extends Controller {
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
 			return;
 		}
-		
+
 		String phone = getPara("phone");
 		if (!MobileUtil.isMobile(phone)) {
 			logger1.info(phone + " " + PHONE_NUMBER_INVALIDATE);
@@ -53,17 +55,26 @@ public class SmsController extends Controller {
 				lastSmsSendTime = Long.parseLong(lastSms.getSendtime());
 			} catch (Exception e) {
 			}
-			if(current - lastSmsSendTime < 10 * 1000) {
-				logger1.info("current:" + current + " lastSmsSendTime:" + lastSmsSendTime + " " + PHONE_NUMBER_INVALIDATE);
+			if (current - lastSmsSendTime < 10 * 1000) {
+				logger1.info(
+						"current:" + current + " lastSmsSendTime:" + lastSmsSendTime + " " + PHONE_NUMBER_INVALIDATE);
 				renderJson(new Result(ResultCode.SMS_ERROR, REQUEST_FAST_ERROR, null));
 				return;
 			}
 		}
-		
+
 		int randCode = (int) (random.nextDouble() * 1000000);
 		logger1.info("发送验证码：" + randCode + " to phone:" + phone);
 
-		// TODO request sms_server to send sms
+		try {
+			SmsUtil.sendSms("SMS_130815233", phone, "{\"code\":\"" + String.valueOf(randCode) + "\"}");
+		} catch (ClientException e) {
+			e.printStackTrace();
+			logger1.info("发送验证码失败,阿里云服务器错误");
+			renderJson(new Result(ResultCode.SMS_ERROR, SMS_SERVER_ERROR, null));
+			return;
+		}
+		logger1.info("阿里云发送短信成功");
 
 		SmsModel smsModel = new SmsModel();
 		smsModel.setPhone(phone);

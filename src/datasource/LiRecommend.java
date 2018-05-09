@@ -19,10 +19,10 @@ public class LiRecommend implements IRecommendSource {
 	public void setCollege(List<CollegeModel> colleges) {
 		allColleges_li_2017.addAll(colleges);
 
-		for (int i = 0; i < allColleges_li_2017.size(); i++) {
-			System.out.println(
-					allColleges_li_2017.get(i).getName() + " li_2017:" + allColleges_li_2017.get(i).getLi_2017());
-		}
+//		for (int i = 0; i < allColleges_li_2017.size(); i++) {
+//			System.out.println(
+//					allColleges_li_2017.get(i).getName() + " li_2017:" + allColleges_li_2017.get(i).getLi_2017());
+//		}
 	}
 
 	public List<CollegeModel> recommendCollege(int score) {
@@ -37,4 +37,10 @@ public class LiRecommend implements IRecommendSource {
 		return results;
 	}
 
+	public void clearCache() {
+		if(recommendCache != null) {
+			recommendCache.clear();
+		}
+	}
+	
 }

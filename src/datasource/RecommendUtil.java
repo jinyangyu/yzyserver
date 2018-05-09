@@ -2,6 +2,8 @@ package datasource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -10,7 +12,7 @@ import bean.dbmodel.CollegeModel;
 public class RecommendUtil {
 	public static Logger logger1 = Logger.getLogger(RecommendUtil.class);
 	private static final RecommendUtil util = new RecommendUtil();
-	private static final int MAX_RECOMMEND_COUNT = 100;
+	public static final int SCORE_RANGE = 20;
 
 	private RecommendUtil() {
 
@@ -21,12 +23,24 @@ public class RecommendUtil {
 	}
 
 	public synchronized List<CollegeModel> recommendCollege(List<CollegeModel> colleges, int score, boolean isWen) {
-		logger1.info("recommend hight score:" + score);
-		int scoreLow = score - 20;
-		logger1.info("recommend low score:" + scoreLow);
-		int firstIndex = 0;
+		
+		int scoreLow = score - SCORE_RANGE;
+		int scoreHigh = score + 5;
+		
+		int firstIndex = -1;
 		int endIndex = 0;
 
+		// 超高分兼容
+		if (isWen) {
+			if (score > Integer.parseInt(colleges.get(0).getWen_2017())) {
+				scoreLow = Integer.parseInt(colleges.get(0).getWen_2017()) - 40;
+			}
+		} else {
+			if (scoreLow > Integer.parseInt(colleges.get(0).getLi_2017())) {
+				scoreLow = Integer.parseInt(colleges.get(0).getLi_2017()) - 40;
+			}
+		}
+		
 		for (int i = 0; i < colleges.size(); i++) {
 			if (isWen) {
 				if ("".equals(colleges.get(i).getWen_2017())) {
@@ -38,14 +52,16 @@ public class RecommendUtil {
 				}
 			}
 
-			int line = Integer.parseInt(colleges.get(i).getWen_2017());
-			if (!isWen) {
+			int line = 0;
+			if (isWen) {
+				line = Integer.parseInt(colleges.get(i).getWen_2017());
+			} else {
 				line = Integer.parseInt(colleges.get(i).getLi_2017());
 			}
 
 			logger1.info(i + " line score:" + line);
 
-			if (line < score && firstIndex == 0) {
+			if (line <= scoreHigh && firstIndex == -1) {
 				firstIndex = i;
 				logger1.info("firstIndex:" + firstIndex);
 			}
@@ -59,10 +75,6 @@ public class RecommendUtil {
 
 		if (firstIndex > endIndex || endIndex >= colleges.size()) {
 			return null;
-		}
-
-		if (endIndex - firstIndex > MAX_RECOMMEND_COUNT) {
-			endIndex = firstIndex + MAX_RECOMMEND_COUNT;
 		}
 
 		List<CollegeModel> resultList = new ArrayList<CollegeModel>();
@@ -84,5 +96,22 @@ public class RecommendUtil {
 
 		logger1.info("==============================================");
 		return resultList;
+	}
+
+	public static void main(String[] args) {
+		SortedMap<String, Integer> map = new TreeMap(); // SortedMap接收TreeMap的实例
+		map.put("504", 54);
+		map.put("510", 67);
+		map.put("430", 24);
+		map.put("502", 52);
+		map.put("450", 38);
+		map.put("480", 48);
+		map.put("502", 52);
+		map.put("502", 53);
+
+		for (String key : map.keySet()) {
+			System.out.println(key + " " + map.get(key) + "%");
+		}
+
 	}
 }

@@ -45,8 +45,12 @@ public class MyOrdersController extends Controller {
 		logger1.info("返回订单信息");
 
 		MyOrdersResult result = new MyOrdersResult(yzyOrders);
-		for (int i = 0; i < result.getOrders().size(); i++) {
-			logger1.info("==== " + result.getOrders().get(i));
+		for (int i = 0; i < result.getRecommend_orders().size(); i++) {
+			logger1.info("RecommendOrders ==== " + result.getRecommend_orders().get(i));
+		}
+		
+		for (int i = 0; i < result.getExpert_orders().size(); i++) {
+			logger1.info("ExpertOrders ==== " + result.getExpert_orders().get(i));
 		}
 		renderJson(new Result(ResultCode.SUCCESS, "success", result));
 	}

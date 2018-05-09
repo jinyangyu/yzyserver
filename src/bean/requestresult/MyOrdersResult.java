@@ -8,27 +8,45 @@ import util.TimeUtil;
 
 public class MyOrdersResult {
 
-	private List<MyOrder> orders;
+	private static final int RECOMMEND_FEE = 20;
+	private static final int EXPERT_FEE = 6888;
+
+	private List<MyOrder> recommend_orders;
+	private List<MyOrder> expert_orders;
 
 	public MyOrdersResult(List<YzyOrderModel> yzyOrders) {
-		orders = new ArrayList<MyOrdersResult.MyOrder>();
+		recommend_orders = new ArrayList<MyOrdersResult.MyOrder>();
+		expert_orders = new ArrayList<MyOrdersResult.MyOrder>();
 		for (int i = 0; i < yzyOrders.size(); i++) {
-			orders.add(new MyOrder(yzyOrders.get(i)));
+			if (yzyOrders.get(i).getType() == 1) {
+				recommend_orders.add(new MyOrder(yzyOrders.get(i)));
+			} else {
+				expert_orders.add(new MyOrder(yzyOrders.get(i)));
+			}
 		}
 	}
 
-	public List<MyOrder> getOrders() {
-		return orders;
+	public List<MyOrder> getRecommend_orders() {
+		return recommend_orders;
 	}
 
-	public void setOrders(List<MyOrder> orders) {
-		this.orders = orders;
+	public void setRecommend_orders(List<MyOrder> recommend_orders) {
+		this.recommend_orders = recommend_orders;
+	}
+
+	public List<MyOrder> getExpert_orders() {
+		return expert_orders;
+	}
+
+	public void setExpert_orders(List<MyOrder> expert_orders) {
+		this.expert_orders = expert_orders;
 	}
 
 	public class MyOrder {
-
+		private String title;
 		private String out_trade_no;
 		private int score;
+		private int total_fee;
 		private String subject;
 		private int type;
 		private String phone;
@@ -42,11 +60,34 @@ public class MyOrdersResult {
 			this.type = yzyOrder.getType();
 			this.phone = yzyOrder.getPhone();
 
+			this.title = score + " - " + subject + " - " + " 院校推荐查询";
+			if (type == 1) {
+				this.total_fee = RECOMMEND_FEE;
+			} else {
+				this.total_fee = EXPERT_FEE;
+			}
+
 			try {
 				this.time = TimeUtil.getFormatTimeFromTimestamp(Long.parseLong(yzyOrder.getTime()),
 						TimeUtil.FORMAT_DATE);
 			} catch (NumberFormatException e) {
 			}
+		}
+
+		public String getTitle() {
+			return title;
+		}
+
+		public void setTitle(String title) {
+			this.title = title;
+		}
+
+		public int getTotal_fee() {
+			return total_fee;
+		}
+
+		public void setTotal_fee(int total_fee) {
+			this.total_fee = total_fee;
 		}
 
 		public String getOut_trade_no() {

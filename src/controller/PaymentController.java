@@ -25,6 +25,11 @@ public class PaymentController extends Controller {
 	private static final int PAY_FOR_RECOMMEND = 1; // 院校推荐订单
 	private static final int PAY_FOR_EXPORT = 2; // 专家预约订单
 	private UserInfoModel currentUser;
+	
+	private static final int MONEY_RECOMMEND = 1;
+	private static final int MONEY_EXPORT = 2;
+	
+	private int fee = MONEY_RECOMMEND;
 
 	private WxPayOrderModel wxOrderModel;
 
@@ -54,8 +59,10 @@ public class PaymentController extends Controller {
 
 		if (payType == PAY_FOR_RECOMMEND) {
 			wxOrderModel.setPayTypeRecommend();
+			fee = MONEY_RECOMMEND;
 		} else if (payType == PAY_FOR_EXPORT) {
 			wxOrderModel.setPayTypeExpert();
+			fee = MONEY_EXPORT;
 		} else {
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "支付类型参数错误", null));
 			return;
@@ -116,10 +123,10 @@ public class PaymentController extends Controller {
 			order.setNonce_str(RandomStringGenerator.getRandomStringByLength(32));
 			order.setBody("豫志愿-院校推荐");
 			order.setOut_trade_no(RandomStringGenerator.getRandomStringByLength(32));
-			order.setTotal_fee(1);
+			order.setTotal_fee(fee);
 			order.setSpbill_create_ip(getRequest().getRemoteHost());
 			logger1.info("getSpbill_create_ip:" + order.getSpbill_create_ip());
-			order.setNotify_url("http://123.207.149.165:8080/yzyserver/wxpay/result");
+			order.setNotify_url("https://www.yujinyang.cn/yzyserver/wxpay/result");
 			order.setTrade_type("JSAPI");
 			order.setOpenid(openid);
 			order.setSign_type("MD5");

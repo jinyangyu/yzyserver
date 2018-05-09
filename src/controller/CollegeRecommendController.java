@@ -1,6 +1,8 @@
 package controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -20,19 +22,29 @@ import bean.dbmodel.WxPayOrderModel;
 import bean.dbmodel.YzyOrderModel;
 import bean.requestinfo.CheckPayOrderInfo;
 import bean.requestinfo.WxPayResultInfo;
+import bean.requestresult.CollegeChanceResult;
 import bean.requestresult.CollegeResult;
 import bean.requestresult.RankResult;
 import bean.requestresult.Result;
 import constant.Configure;
 import constant.ResultCode;
+import datasource.ChanceUtil;
 import datasource.DataSource;
+import datasource.SortAndFilter;
 import util.HttpRequest;
 import util.RandomStringGenerator;
 import util.Signature;
 
 public class CollegeRecommendController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegeRecommendController.class);
+
+	private static final int DEFAULT_PAGE_SIZE = 20;
+
 	private String subject;
+	private int pageSize = DEFAULT_PAGE_SIZE;
+	private int pageNum = 0;
+
+	boolean checkOrder = false;
 
 	public void recommend() {
 
@@ -43,8 +55,21 @@ public class CollegeRecommendController extends Controller {
 		String clientSession = getPara("clientSession");
 		String out_trade_no = getPara("out_trade_no");
 
+		try {
+			pageSize = Integer.parseInt(getPara("pageSize"));
+		} catch (Exception e) {
+		}
+		if (pageSize <= 10) {
+			pageSize = 10;
+		}
+
+		try {
+			pageNum = Integer.parseInt(getPara("pageNum"));
+		} catch (Exception e) {
+		}
+
 		logger1.info("scoreStr:" + scoreStr + " subject:" + subject + " clientSession:" + clientSession
-				+ " out_trade_no:" + out_trade_no);
+				+ " out_trade_no:" + out_trade_no + " pageSize:" + pageSize + " pageNum:" + pageNum);
 
 		int score = 0;
 		try {
@@ -83,21 +108,26 @@ public class CollegeRecommendController extends Controller {
 			return;
 		}
 
-		List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find(
-				"select * from orders_yzy where out_trade_no = ? and type = 1 and openid = ?", out_trade_no,
-				user.getOpenid());
-		if (yzyOrders != null && yzyOrders.size() != 0 && yzyOrders.get(0).getOut_trade_no() != null
-				&& !"".equals(yzyOrders.get(0).getOut_trade_no()) && score == yzyOrders.get(0).getScore()
-				&& subject.equals(yzyOrders.get(0).getSubject())) {
-			// 2、检查订单数据，如果是已存在完成的订单，则直接查询。
-			doRecommendByScore(score, isWen);
+		if (checkOrder) {
+			List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find(
+					"select * from orders_yzy where out_trade_no = ? and type = 1 and openid = ?", out_trade_no,
+					user.getOpenid());
+			if (yzyOrders != null && yzyOrders.size() != 0 && yzyOrders.get(0).getOut_trade_no() != null
+					&& !"".equals(yzyOrders.get(0).getOut_trade_no()) && score == yzyOrders.get(0).getScore()
+					&& subject.equals(yzyOrders.get(0).getSubject())) {
+				// 2、检查订单数据，如果是已存在完成的订单，则直接查询。
+				doRecommendByScore(score, isWen);
 
-			yzyOrders.get(0).setTime(String.valueOf(System.currentTimeMillis()));
-			yzyOrders.get(0).update();
+				yzyOrders.get(0).setTime(String.valueOf(System.currentTimeMillis()));
+				yzyOrders.get(0).update();
+			} else { // 1、新订单，检查支付结果
+				startRecommendByCheckWxOrder(out_trade_no, user, score, isWen);
+			}
 		} else {
-			// 1、新订单，检查支付结果
-			startRecommendByCheckWxOrder(out_trade_no, user, score, isWen);
+			doRecommendByScore(score, isWen);
 		}
+		
+//		 doRecommendByScore(score, isWen);
 	}
 
 	private void startRecommendByCheckWxOrder(String out_trade_no, UserInfoModel user, int score, boolean isWen) {
@@ -226,15 +256,78 @@ public class CollegeRecommendController extends Controller {
 	}
 
 	private void doRecommendByScore(int score, boolean isWen) {
-		List<CollegeModel> colleges = DataSource.getInstance().recommendCollege(score, isWen);
+		List<CollegeModel> colleges_all = DataSource.getInstance().recommendCollege(score, isWen);
+		logger1.info("doRecommendByScore colleges_all:" + colleges_all.size());
 
+		String sortKey = getPara("sort");
+		String filters = getPara("filters");
+		String provinces = getPara("provinces");
+
+		if (filters != null && !"".equals(filters)) {
+			try {
+				filters = URLDecoder.decode(filters, "UTF-8");
+				logger1.info("filters UTF8:" + filters);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (provinces != null && !"".equals(provinces)) {
+			try {
+				provinces = URLDecoder.decode(provinces, "UTF-8");
+				logger1.info("provinces UTF8:" + provinces);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+
+		logger1.info("doRecommendByScore sortKey:" + sortKey + " filters:" + filters + " isWen:" + isWen + " provinces:"
+				+ provinces);
+
+		// 填入录取概率
 		CollegeResult collegeResult = new CollegeResult();
-		collegeResult.setColleges(colleges);
-		List<RankResult> ranks = new ArrayList<RankResult>();
-		ranks.add(new RankResult("2017", "102017"));
-		ranks.add(new RankResult("2016", "202016"));
-		ranks.add(new RankResult("2015", "302015"));
-		collegeResult.setRanks(ranks);
+		ChanceUtil chanceUtil = new ChanceUtil();
+		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges_all, isWen, score);
+
+		// 对含概率的院校列表进行排序+筛选
+		SortAndFilter sortAndFilter = new SortAndFilter(chanceCollegeList, sortKey, filters, provinces, isWen);
+		chanceCollegeList = sortAndFilter.getResults();
+
+		logger1.info("doRecommendByScore chanceCollegeList:" + chanceCollegeList.size());
+		int totalPage = Math.max(1, (int) Math.ceil((double) chanceCollegeList.size() / (double) pageSize));
+
+		List<CollegeChanceResult> resultCollegeList = new ArrayList<CollegeChanceResult>();
+		if (chanceCollegeList.size() > 0) {
+
+			logger1.info("doRecommendByScore totalPage:" + totalPage);
+
+			if (pageNum >= totalPage) {
+
+			} else {
+
+				logger1.info("doRecommendByScore college from:" + (pageNum * pageSize) + " to:"
+						+ Math.min(colleges_all.size(), (pageNum + 1) * pageSize));
+				for (int i = (pageNum * pageSize); i < Math.min(chanceCollegeList.size(),
+						(pageNum + 1) * pageSize); i++) {
+					resultCollegeList.add(chanceCollegeList.get(i));
+				}
+			}
+		}
+
+		collegeResult.setTotalPage(totalPage);
+		collegeResult.setTotalSize(colleges_all.size());
+		collegeResult.setColleges(resultCollegeList);
+
+		if (!colleges_all.isEmpty()) {
+			List<RankResult> ranks = new ArrayList<RankResult>();
+			ranks.add(
+					new RankResult("2017", String.valueOf(DataSource.getInstance().get2017RankByScore(score, isWen))));
+			ranks.add(
+					new RankResult("2016", String.valueOf(DataSource.getInstance().get2016RankByScore(score, isWen))));
+			ranks.add(
+					new RankResult("2015", String.valueOf(DataSource.getInstance().get2015RankByScore(score, isWen))));
+			collegeResult.setRanks(ranks);
+		}
 
 		renderJson(new Result(ResultCode.SUCCESS, "query success", collegeResult));
 	}

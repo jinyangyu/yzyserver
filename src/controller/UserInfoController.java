@@ -25,7 +25,6 @@ public class UserInfoController extends Controller {
 		String jsCode = getPara("js_code");
 		String loginInfo = "";
 		
-		
 		try {
 			loginInfo = URLDecoder.decode(getPara("loginInfo"),"UTF-8");
 			logger1.info("loginInfoUTF8:" + loginInfo);	

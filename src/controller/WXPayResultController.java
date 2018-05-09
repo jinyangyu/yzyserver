@@ -88,7 +88,7 @@ public class WXPayResultController extends Controller {
 			if (order.getTotal_fee() != payResultInfo.getTotal_fee()
 					|| !order.getMch_id().equals(payResultInfo.getMch_id())
 					|| !order.getOpenid().equals(payResultInfo.getOpenid())) {
-				
+
 				logger1.error("------- 支付信息与本地不一致");
 				return;
 			}
