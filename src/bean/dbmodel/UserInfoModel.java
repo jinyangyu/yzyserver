@@ -17,6 +17,7 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	private String sessionKey;
 	private String clientSession;
 	private String pdfPath;
+	private String qrcode;
 
 	private static final String id_NAME = "id";
 	private static final String nickName_NAME = "nickName";
@@ -30,6 +31,7 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	private static final String sessionKey_NAME = "sessionKey";
 	private static final String clientSession_NAME = "clientSession";
 	private static final String pdfPath_NAME = "pdfPath";
+	private static final String qrcode_NAME = "qrcode";
 
 	public String getId() {
 		return id;
@@ -127,13 +129,21 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	public void setPdfPath(String pdfPath) {
 		set(pdfPath_NAME, pdfPath);
 	}
+	
+	public String getQrcode() {
+		return getStr(qrcode_NAME);
+	}
+
+	public void setQrcode(String qrcode) {
+		set(qrcode_NAME, qrcode);
+	}
 
 	@Override
 	public String toString() {
 		return "UserInfoModel [id=" + id + ", nickName=" + nickName + ", avatarUrl=" + avatarUrl + ", gender=" + gender
 				+ ", city=" + city + ", province=" + province + ", country=" + country + ", language=" + language
 				+ ", openid=" + openid + ", sessionKey=" + sessionKey + ", clientSession=" + clientSession
-				+ ", pdfPath=" + pdfPath + "]";
+				+ ", pdfPath=" + pdfPath + ", qrcode=" + qrcode + "]";
 	}
 
 }

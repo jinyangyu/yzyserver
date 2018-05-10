@@ -10,6 +10,7 @@ import com.jfinal.template.Engine;
 
 import bean.dbmodel.ChanceCacheModel;
 import bean.dbmodel.CollegeModel;
+import bean.dbmodel.QrCodeModel;
 import bean.dbmodel.ScoreRankModel;
 import bean.dbmodel.SmsModel;
 import bean.dbmodel.UserInfoModel;
@@ -21,6 +22,7 @@ import controller.SmsVerifyController;
 import controller.ExpertPaySuccessController;
 import controller.MyOrdersController;
 import controller.PaymentController;
+import controller.QRCodeBindController;
 import controller.SmsController;
 import controller.UserInfoController;
 import controller.WXPayResultController;
@@ -60,6 +62,8 @@ public class YzyConfig extends JFinalConfig {
 		System.out.println("configRoute MyOrdersController");
 		me.add("/expertpaysuccess", ExpertPaySuccessController.class);
 		System.out.println("configRoute ExpertPaySuccessController");
+		me.add("/qrcode", QRCodeBindController.class);
+		System.out.println("configRoute QRCodeBindController");
 	}
 
 	public void configEngine(Engine me) {
@@ -83,6 +87,7 @@ public class YzyConfig extends JFinalConfig {
 		arp.addMapping("orders_yzy", YzyOrderModel.class);
 		arp.addMapping("scores", ScoreRankModel.class);
 		arp.addMapping("chance_cache", ChanceCacheModel.class);
+		arp.addMapping("qrcode", QrCodeModel.class);
 		arp.setShowSql(true);
 	}
 

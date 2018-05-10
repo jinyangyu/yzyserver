@@ -53,32 +53,47 @@ public class HelloController extends Controller {
 		// List<CollegeModel> colleges =
 		// DataSource.getInstance().recommendCollege(100,true);
 
-		// String result =
-		// HttpKit.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="
-		// + Configure.getAppID()
-		// + "&secret=" + Configure.getSecret());
+//		 String result =
+//		 HttpKit.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="
+//		 + Configure.getAppID()
+//		 + "&secret=" + Configure.getSecret());
 
 		/*
-		 * "data": " { \"access_token\":
-		 * \"9_pygitvSWEU1r-ivA54I0w8cTCNAa5rFKg88QQcDn0IKy4xKaEHMr9zr5Ozw2EakR5ivm3aXD6sGPh2wOO5wM-ufLr1y6OkqPmKDs-am0zQid1bRRHRHcWmNLZPTvyKwHg5ZguXBgYR8-FxhFQXMcADAMTI\",
-		 * \"expires_in\":7200 }",
+		 {
+			"data": "{\"access_token\":\"9_3ef7d4Kqv1To5ZtZi3wo79kFOhGalh-pm-4FHEXsWzkYLSoLIiN622A_P1Hq4fp-kplXeY1Tsv36SJ5cbX_4H9PaZgCCK3g7vwASCNe52gH5_VN5HG505ddh6f3MmAAckenQnMhamR7q12HbOSKbAEADHZ\",\"expires_in\":7200}",
+			"result_code": 200,
+			"result_msg": "query success"
+		 }
 		 */
 
-		String token = "9_pygitvSWEU1r-ivA54I0w8cTCNAa5rFKg88QQcDn0IKy4xKaEHMr9zr5Ozw2EakR5ivm3aXD6sGPh2wOO5wM-ufLr1y6OkqPmKDs-am0zQid1bRRHRHcWmNLZPTvyKwHg5ZguXBgYR8-FxhFQXMcADAMTI";
+		String token = "9_3ef7d4Kqv1To5ZtZi3wo79kFOhGalh-pm-4FHEXsWzkYLSoLIiN622A_P1Hq4fp-kplXeY1Tsv36SJ5cbX_4H9PaZgCCK3g7vwASCNe52gH5_VN5HG505ddh6f3MmAAckenQnMhamR7q12HbOSKbAEADHZ";
 
-		HashMap<String, String> queryParas = new HashMap<String, String>();
-		queryParas.put("scene", "yujinyang");
+		
+		for(int i=1000;i<2000;i++) {
+			createQrCode(token, i);
+		}
+		
+
+		renderJson(new Result(200, "query success", ""));
+	}
+	
+	private void createQrCode(String token, int number) {
+		HashMap<String, Object> queryParas = new HashMap<String, Object>();
+		queryParas.put("scene", "tuiguang_" + number);
 		queryParas.put("page", "pages/index/index");
 		queryParas.put("width", "430");
-		queryParas.put("auto_color", "true");
+		queryParas.put("auto_color", true);
 		
 		
 
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
 		HttpPost httpPost = new HttpPost("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + token);
-		httpPost.addHeader(HTTP.CONTENT_TYPE, "application/json");
+		httpPost.addHeader("content-type", "application/json");
 		String body = JSON.toJSONString(queryParas);
+		
+		System.out.println(body);
+		
 		StringEntity entity;
 		
 		String result = "";
@@ -92,8 +107,13 @@ public class HelloController extends Controller {
 
 			response = httpClient.execute(httpPost);
 			InputStream inputStream = response.getEntity().getContent();
-
-			File codeFile = new File("/root/apache-tomcat-7.0.85/webapps/yzyserver/yujinyang_code.png");
+			
+//			File codeFile = new File("/root/apache-tomcat-7.0.85/webapps/yzyserver/yujinyang_code.png");
+			
+			String qrFileName = "/Users/yujinyang11/Desktop/app_code_1000_2000/豫志愿推广二维码_" + number + ".png";
+			
+			File codeFile = new File(qrFileName);
+			
 			FileOutputStream out = new FileOutputStream(codeFile);
 
 			byte[] buffer = new byte[8192];
@@ -105,13 +125,11 @@ public class HelloController extends Controller {
 			out.flush();
 			out.close();
 			
-			result = "save png " + codeFile.getAbsolutePath() + " size:" + codeFile.getTotalSpace();
+			System.out.println("成功生成 " + qrFileName);
 		} catch (Exception e) {
 			result = e.getMessage();
 			e.printStackTrace();
 		}
-
-		renderJson(new Result(200, "query success", result));
 	}
 	
 	public void setRank() {
