@@ -20,14 +20,17 @@ import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyuncs.exceptions.ClientException;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.HttpKit;
 
 import bean.dbmodel.CollegeModel;
 import bean.requestresult.Result;
 import constant.Configure;
+import constant.ResultCode;
 import controller.CollegeRecommendController;
 import datasource.DataSource;
+import util.sms.SmsUtil;
 
 public class HelloController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegeRecommendController.class);
@@ -175,6 +178,18 @@ public class HelloController extends Controller {
 	
 	public void clearRecommendCache() {
 		renderHtml(DataSource.getInstance().clearRecommendCache());
+	}
+	
+	public void sendSMS() {
+		try {
+			SmsUtil.sendSms("SMS_130815233", "18210512166", "{\"code\":\"" + String.valueOf(444232) + "\"}");
+		} catch (ClientException e) {
+			e.printStackTrace();
+			logger1.info("发送验证码失败,阿里云服务器错误");
+			renderJson(new Result(ResultCode.SMS_ERROR, "短信发送失败，请稍后尝试", null));
+			return;
+		}
+		renderJson(new Result(ResultCode.SUCCESS, "短信发送成功", null));
 	}
 
 }
