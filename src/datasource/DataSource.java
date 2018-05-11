@@ -129,7 +129,7 @@ public class DataSource {
 				return rank.getCount();
 			}
 		}
-		return 100;
+		return -1;
 	}
 	
 	/*
@@ -145,7 +145,7 @@ public class DataSource {
 				return rank.getCount();
 			}
 		}
-		return 100;
+		return -1;
 	}
 	
 	/*
@@ -161,7 +161,7 @@ public class DataSource {
 				return rank.getCount();
 			}
 		}
-		return 100;
+		return -1;
 	}
 
 	private Comparator liComp = new Comparator<CollegeModel>() {

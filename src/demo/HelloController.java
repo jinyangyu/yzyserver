@@ -3,30 +3,21 @@ package demo;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.exceptions.ClientException;
 import com.jfinal.core.Controller;
-import com.jfinal.kit.HttpKit;
 
 import bean.dbmodel.CollegeModel;
 import bean.requestresult.Result;
-import constant.Configure;
 import constant.ResultCode;
 import controller.CollegeRecommendController;
 import datasource.DataSource;
