@@ -37,6 +37,9 @@ public class WxPayOrderModel extends Model<WxPayOrderModel> {
 	// ----- 检查订单状态返回字段
 	private String trade_state;
 	private String trade_state_desc;
+	
+	// ----- 额外信息字段
+	private String extra;
 
 	private static final String id_NAME = "id";
 
@@ -62,6 +65,8 @@ public class WxPayOrderModel extends Model<WxPayOrderModel> {
 
 	private static final String trade_state_NAME = "trade_state";
 	private static final String trade_state_desc_NAME = "trade_state_desc";
+	
+	private static final String extra_NAME = "extra";
 
 	public String getId() {
 		return getStr(id_NAME);
@@ -97,6 +102,10 @@ public class WxPayOrderModel extends Model<WxPayOrderModel> {
 
 	public void setPayTypeExpert() {
 		set(payType_NAME, "EXPERT");
+	}
+	
+	public void setPayTypePrepay() {
+		set(payType_NAME, "PREPAY");
 	}
 
 	public String getAppid() {
@@ -237,6 +246,14 @@ public class WxPayOrderModel extends Model<WxPayOrderModel> {
 
 	public void setStatusPayFailed() {
 		set(status_NAME, "PAY_Failed");
+	}
+	
+	public String getExtra() {
+		return getStr(extra_NAME);
+	}
+	
+	public void setExtra(String extra) {
+		set(extra_NAME, extra);
 	}
 
 	@Override

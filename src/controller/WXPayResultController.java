@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;
 
+import bean.dbmodel.PrepayCountModel;
 import bean.dbmodel.WxPayOrderModel;
 import bean.requestinfo.WxPayResultInfo;
 import util.Signature;
@@ -104,10 +105,37 @@ public class WXPayResultController extends Controller {
 
 			logger1.info("update order:" + order.toString() + " \n===========in to databases");
 			order.update();
+
+			if ("PREPAY".equals(order.getPayType())) {
+				updatePrepayCount(order.getOpenid(), order.getOut_trade_no(), order.getExtra());
+			}
 		}
 
-		StringBuffer sb = new StringBuffer("<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>");
-
 		renderText("<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>");
+	}
+
+	/**
+	 * 检查是否是预购买成功回调，如果是，则将预购买次数，写入数据库
+	 */
+	private void updatePrepayCount(String openid, String out_trade_no, String extra) {
+		// 预购买次数下单成功，写入购买次数
+		int prepayCount = Integer.parseInt(extra);
+
+		List<PrepayCountModel> prepayCounts = PrepayCountModel.dao
+				.find("select * from prepay_count where out_trade_no = ?", out_trade_no);
+
+		if (prepayCounts != null || prepayCounts.size() >= 1) {
+			logger1.info("微信推送支付结果，支付成功。此次支付的预购买记录已写入，说明支付后，快速点击了院校推荐，那里手动查询了微信支付结果。此次推送结果滞后。不写入预购次数");
+		} else {
+			logger1.info("微信推送支付结果，支付成功。写入预购次数");
+			
+			PrepayCountModel prepayModel = new PrepayCountModel();
+			prepayModel.setOpenid(openid);
+			prepayModel.setOut_trade_no(out_trade_no);
+			prepayModel.setCurrentCount(prepayCount);
+			prepayModel.setTotalCount(prepayCount);
+			prepayModel.setTime(String.valueOf(System.currentTimeMillis()));
+			prepayModel.save();
+		}
 	}
 }

@@ -9,4 +9,6 @@ public interface ResultCode {
 	int PARAMS_ERROR = 601;
 	int SIGN_ERROR = 701;
 	int PAY_ERROR = 801;
+	int PREPAY_COUNT_0 = 901;
+	int PREPAY_COUNT_NULL = 902;
 }

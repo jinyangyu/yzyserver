@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 
 import com.jfinal.core.Controller;
 
+import bean.dbmodel.PrepayCountModel;
 import bean.dbmodel.SmsModel;
 import bean.dbmodel.UserInfoModel;
 import bean.dbmodel.YzyOrderModel;
@@ -31,15 +32,15 @@ public class MyOrdersController extends Controller {
 			return;
 		}
 
-		UserInfoModel user = users.get(0);
-		logger1.info("user:" + user.getNickName() + " openId:" + user.getOpenid());
+		UserInfoModel currentUser = users.get(0);
+		logger1.info("currentUser:" + currentUser.getNickName() + " openId:" + currentUser.getOpenid());
 
-		if ("".equals(user.getOpenid())) {
+		if ("".equals(currentUser.getOpenid())) {
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
 			return;
 		}
 
-		String openid = user.getOpenid();
+		String openid = currentUser.getOpenid();
 		List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find("select * from orders_yzy where openid = ?", openid);
 
 		logger1.info("返回订单信息");
@@ -48,10 +49,21 @@ public class MyOrdersController extends Controller {
 		for (int i = 0; i < result.getRecommend_orders().size(); i++) {
 			logger1.info("RecommendOrders ==== " + result.getRecommend_orders().get(i));
 		}
-		
+
 		for (int i = 0; i < result.getExpert_orders().size(); i++) {
 			logger1.info("ExpertOrders ==== " + result.getExpert_orders().get(i));
 		}
+
+		List<PrepayCountModel> prepayCounts = PrepayCountModel.dao.find("select * from prepay_count where openid = ?",
+				currentUser.getOpenid());
+
+		if (prepayCounts == null || prepayCounts.size() < 1) {
+		} else {
+			PrepayCountModel prepayModel = prepayCounts.get(0);
+			result.setTotal_count(prepayModel.getTotalCount());
+			result.setCurrent_count(prepayModel.getCurrentCount());
+		}
+
 		renderJson(new Result(ResultCode.SUCCESS, "success", result));
 	}
 

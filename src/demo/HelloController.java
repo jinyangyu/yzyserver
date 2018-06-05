@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -15,9 +16,11 @@ import org.apache.log4j.Logger;
 import com.alibaba.fastjson.JSON;
 import com.aliyuncs.exceptions.ClientException;
 import com.jfinal.core.Controller;
+import com.jfinal.kit.HttpKit;
 
 import bean.dbmodel.CollegeModel;
 import bean.requestresult.Result;
+import constant.Configure;
 import constant.ResultCode;
 import controller.CollegeRecommendController;
 import datasource.DataSource;
@@ -57,10 +60,10 @@ public class HelloController extends Controller {
 		 }
 		 */
 
-		String token = "9_3ef7d4Kqv1To5ZtZi3wo79kFOhGalh-pm-4FHEXsWzkYLSoLIiN622A_P1Hq4fp-kplXeY1Tsv36SJ5cbX_4H9PaZgCCK3g7vwASCNe52gH5_VN5HG505ddh6f3MmAAckenQnMhamR7q12HbOSKbAEADHZ";
+		String token = "10_sSKuvsW1HizYR7_wy4PeZDdgwVFmKvJYYsamUatfcFjl9p3zxHyJeDL_-qTvqcgJD8PSrc4gQFyXPyEwpNtp4Sir0fkfC6pamekEJTgrAm_z92MT_iTynGLilqvpHWdTdLXf8haddn3crRh_GQWjAJAUEK";
 
 		
-		for(int i=1000;i<2000;i++) {
+		for(int i=2000;i<3000;i++) {
 			createQrCode(token, i);
 		}
 		
@@ -101,7 +104,7 @@ public class HelloController extends Controller {
 			
 //			File codeFile = new File("/root/apache-tomcat-7.0.85/webapps/yzyserver/yujinyang_code.png");
 			
-			String qrFileName = "/Users/yujinyang11/Desktop/app_code_1000_2000/豫志愿推广二维码_" + number + ".png";
+			String qrFileName = "/Users/yujinyang11/Desktop/app_code_2000_3000/豫志愿推广二维码_" + number + ".png";
 			
 			File codeFile = new File(qrFileName);
 			

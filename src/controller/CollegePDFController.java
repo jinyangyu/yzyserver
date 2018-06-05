@@ -1,24 +1,36 @@
 package controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FontProvider;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfGState;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.ElementList;
+import com.itextpdf.tool.xml.XMLWorkerHelper;
 import com.jfinal.core.Controller;
 
 import bean.dbmodel.CollegeModel;
@@ -26,7 +38,9 @@ import bean.dbmodel.UserInfoModel;
 import bean.requestresult.PdfResult;
 import bean.requestresult.Result;
 import constant.ResultCode;
+import datasource.DataSource;
 import util.FontUtil;
+import util.MyXMLWorkerHelper;
 
 public class CollegePDFController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegePDFController.class);
@@ -37,6 +51,7 @@ public class CollegePDFController extends Controller {
 
 	public void createPDF() {
 
+		/*
 		String clientSession = getPara("clientSession");
 
 		logger1.info("clientSession:" + clientSession);
@@ -55,9 +70,9 @@ public class CollegePDFController extends Controller {
 		}
 
 		requestTime = System.currentTimeMillis();
-
-		List<CollegeModel> colleges = CollegeModel.dao.find("select * from college where id < 4");
-
+		
+		List<CollegeModel> colleges = DataSource.getInstance().recommendCollege(678, false);
+		
 		for (CollegeModel model : colleges) {
 			String[] names = model._getAttrNames();
 			for (String name : names) {
@@ -83,12 +98,87 @@ public class CollegePDFController extends Controller {
 			e.printStackTrace();
 			logger1.error("create pdf " + getPdfName() + " failed", e);
 		}
-		if (pdfFile != null) {
-			renderJson(new Result(ResultCode.SUCCESS, "create success", new PdfResult(pdfFile.getName())));
-		} else {
-			renderJson(new Result(ResultCode.PDF_ERROR, "生成PDF失败,请稍后重试", null));
+		*/
+		
+		Rectangle rect = new Rectangle(PageSize.A4);
+		rect.setBackgroundColor(new BaseColor(234, 234, 234));
+        Document document = new Document(rect, 0, 0, 0, 0);  
+        PdfWriter mPdfWriter;
+        File file = new File("demo.pdf");
+		try {
+			
+            
+			// step 1
+            
+            // step 2
+            PdfWriter.getInstance(document, new FileOutputStream(file));
+            // step 3
+            document.open();
+            
+            PdfPTable table = new PdfPTable(1);
+            table.setWidthPercentage(100.0f);
+            
+            // step 4
+            createTable(table);
+            
+            document.add(table);
+	        
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			//第五步，关闭Document  
+			document.close();  
+		}
+        
+        System.out.println( "OK!" );  
+        
+        
+        File newfFile = new File("warterPDF.pdf");
+		waterMark(file.getPath(), "image/yuzhiyuan.png", newfFile.getPath(), "豫志愿", 16);
+
+        
+        
+		
+//		renderJson(new Result(ResultCode.SUCCESS, "create success",null));
+	}
+
+	private void createTable(PdfPTable table) throws IOException {
+		for(int i=0;i<20;i++) {
+			table.addCell(getCell(i));
 		}
 	}
+	
+	private PdfPCell getCell(int index) throws IOException {
+		StringBuilder sb = new StringBuilder();
+        sb.append("<div><p align=\"center\">");
+        sb.append("<b>&nbsp;<font color=\"#000\">河南高考志愿填报助手" + index + "</font></b>");
+        sb.append("</p>\n</div>");
+        
+        PdfPCell cell = new PdfPCell();
+        cell.setBorder(0);
+        cell.setBackgroundColor(BaseColor.WHITE);
+        cell.setBorderColorBottom(new BaseColor(251, 249, 249));
+        cell.setPaddingTop(20);
+        cell.setBorderWidthBottom(15);
+        cell.setPaddingBottom(35);
+        
+//        ElementList list = XMLWorkerHelper.parseToElementList(sb.toString(), null);
+        ElementList list = MyXMLWorkerHelper.parseToElementList(sb.toString(), null);
+        for (Element element : list) {
+            cell.addElement(element);
+        }
+        return cell;
+	}
+	
+	
+	
 
 	private void createPdfFile(File pdfFile) throws FileNotFoundException, DocumentException {
 		// 新建Document对象
@@ -230,6 +320,46 @@ public class CollegePDFController extends Controller {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/** 
+     * 拼写html字符串代码 
+     * <p>Title: getHtml</p> 
+     * @author Liyan 
+     * @date   2017年4月1日 下午6:30:30 
+     */  
+    public static String getHtml() {  
+        StringBuffer html = new StringBuffer();                                                                                                             
+        html.append("<div><h1>咆哮的小鸡</h1></div>");  
+        html.append("<div><img src='http://www.photo0086.com/member/5758/pic/2013081217201520156.JPG'/></div>");  
+                                                     
+        
+        html.append("<font size=\"3\" color=\"red\">红色字体</font>");
+        
+        return html.toString();  
+    }  
+  
+    /** 
+     * 解决中文字体 
+     * <p>Title: ChinaFontProvide</p> 
+     * @author  Liyan 
+     * @date    2017年4月1日 下午6:30:48 
+     */  
+    public static final class ChinaFontProvide implements FontProvider {
+
+		public Font getFont(String arg0, String arg1, boolean arg2, float arg3, int arg4, BaseColor arg5) {
+			return FontUtil.getITextSong();
+		}
+
+		public boolean isRegistered(String arg0) {
+			return false;
+		}  
+        
+    }  
+    
+    public static void main(String[] args) {
+		CollegePDFController controller = new CollegePDFController();
+		controller.createPDF();
 	}
 	
 }

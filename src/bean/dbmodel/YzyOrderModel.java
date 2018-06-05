@@ -66,7 +66,7 @@ public class YzyOrderModel extends Model<YzyOrderModel> {
 	public void setExpertType() {
 		set(type_NAME, 2);
 	}
-
+	
 	public String getPhone() {
 		return getStr(phone_NAME);
 	}

@@ -28,7 +28,7 @@ public class QRCodeBindController extends Controller {
 			return;
 		}
 
-		String qrCode = getPara("qrcode");
+		String qrCode = getPara("scene");
 		if (qrCode == null || "".equals(qrCode)) {
 			qrCode = "0000";
 		}

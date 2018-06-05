@@ -23,10 +23,11 @@ public class WenRecommend implements IRecommendSource {
 	public void setCollege(List<CollegeModel> colleges) {
 		allColleges_wen_2017.addAll(colleges);
 
-//		for (int i = 0; i < allColleges_wen_2017.size(); i++) {
-//			System.out.println(
-//					allColleges_wen_2017.get(i).getName() + " wen_2017:" + allColleges_wen_2017.get(i).getWen_2017());
-//		}
+		// for (int i = 0; i < allColleges_wen_2017.size(); i++) {
+		// System.out.println(
+		// allColleges_wen_2017.get(i).getName() + " wen_2017:" +
+		// allColleges_wen_2017.get(i).getWen_2017());
+		// }
 	}
 
 	public List<CollegeModel> recommendCollege(int score) {
@@ -43,10 +44,10 @@ public class WenRecommend implements IRecommendSource {
 		}
 		return results;
 	}
-	
+
 	public String clearCache() {
 		int size = recommendCache.size();
-		if(recommendCache != null) {
+		if (recommendCache != null) {
 			recommendCache.clear();
 		}
 		return "文科推荐数据，已清空 " + size + " 条缓存\n";

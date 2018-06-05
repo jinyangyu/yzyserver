@@ -8,11 +8,13 @@ import util.TimeUtil;
 
 public class MyOrdersResult {
 
-	private static final int RECOMMEND_FEE = 20;
+	private static final int RECOMMEND_FEE = 49;
 	private static final int EXPERT_FEE = 6888;
 
 	private List<MyOrder> recommend_orders;
 	private List<MyOrder> expert_orders;
+	private int total_count;
+	private int current_count;
 
 	public MyOrdersResult(List<YzyOrderModel> yzyOrders) {
 		recommend_orders = new ArrayList<MyOrdersResult.MyOrder>();
@@ -40,6 +42,22 @@ public class MyOrdersResult {
 
 	public void setExpert_orders(List<MyOrder> expert_orders) {
 		this.expert_orders = expert_orders;
+	}
+
+	public int getTotal_count() {
+		return total_count;
+	}
+
+	public void setTotal_count(int total_count) {
+		this.total_count = total_count;
+	}
+
+	public int getCurrent_count() {
+		return current_count;
+	}
+
+	public void setCurrent_count(int current_count) {
+		this.current_count = current_count;
 	}
 
 	public class MyOrder {

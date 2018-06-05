@@ -23,10 +23,10 @@ public class RecommendUtil {
 	}
 
 	public synchronized List<CollegeModel> recommendCollege(List<CollegeModel> colleges, int score, boolean isWen) {
-		
+
 		int scoreLow = score - SCORE_RANGE;
 		int scoreHigh = score + 5;
-		
+
 		int firstIndex = -1;
 		int endIndex = 0;
 
@@ -40,7 +40,7 @@ public class RecommendUtil {
 				scoreLow = Integer.parseInt(colleges.get(0).getLi_2017()) - 40;
 			}
 		}
-		
+
 		for (int i = 0; i < colleges.size(); i++) {
 			if (isWen) {
 				if ("".equals(colleges.get(i).getWen_2017())) {
@@ -59,7 +59,7 @@ public class RecommendUtil {
 				line = Integer.parseInt(colleges.get(i).getLi_2017());
 			}
 
-			logger1.info(i + " line score:" + line);
+			// logger1.info(i + " line score:" + line);
 
 			if (line <= scoreHigh && firstIndex == -1) {
 				firstIndex = i;

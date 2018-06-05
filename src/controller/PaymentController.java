@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;
 
+import bean.dbmodel.PrepayCountModel;
 import bean.dbmodel.UserInfoModel;
 import bean.dbmodel.WxPayOrderModel;
 import bean.requestinfo.PrepayOrderInfo;
@@ -24,11 +25,13 @@ public class PaymentController extends Controller {
 
 	private static final int PAY_FOR_RECOMMEND = 1; // 院校推荐订单
 	private static final int PAY_FOR_EXPORT = 2; // 专家预约订单
+	private static final int PAY_FOR_PREPAY = 3900; // 39元预支付
 	private UserInfoModel currentUser;
-	
+
 	private static final int MONEY_RECOMMEND = 1;
 	private static final int MONEY_EXPORT = 2;
-	
+	private static final int MONEY_PREPAY = 1;
+
 	private int fee = MONEY_RECOMMEND;
 
 	private WxPayOrderModel wxOrderModel;
@@ -55,6 +58,14 @@ public class PaymentController extends Controller {
 			return;
 		}
 
+		int prepayCount = 0;
+		if (payType == PAY_FOR_PREPAY) {
+			prepayCount = getParaToInt("num");
+			if (prepayCount < 1) {
+				prepayCount = 1;
+			}
+		}
+
 		wxOrderModel = new WxPayOrderModel();
 
 		if (payType == PAY_FOR_RECOMMEND) {
@@ -63,6 +74,9 @@ public class PaymentController extends Controller {
 		} else if (payType == PAY_FOR_EXPORT) {
 			wxOrderModel.setPayTypeExpert();
 			fee = MONEY_EXPORT;
+		} else if (payType == PAY_FOR_PREPAY) {
+			wxOrderModel.setPayTypePrepay();
+			fee = MONEY_PREPAY * prepayCount;
 		} else {
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "支付类型参数错误", null));
 			return;
@@ -105,6 +119,11 @@ public class PaymentController extends Controller {
 			wxOrderModel.setPrepay_id(returnInfo.getPrepay_id());
 			wxOrderModel.setStatusPrepaySuccess();
 			wxOrderModel.save();
+
+			if (payType == PAY_FOR_PREPAY) {
+				wxOrderModel.setExtra(String.valueOf(prepayCount));
+				wxOrderModel.update();
+			}
 
 			renderJson(new Result(ResultCode.SUCCESS, "query success", result));
 		} else {
@@ -181,8 +200,8 @@ public class PaymentController extends Controller {
 		}
 		return null;
 	}
-	
+
 	public void cancel() {
-		
+
 	}
 }
