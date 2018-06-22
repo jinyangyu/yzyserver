@@ -9,13 +9,15 @@ import com.itextpdf.text.pdf.BaseFont;
 public class FontUtil {
 	private static BaseFont baseFont = null;
 	private static Font weiRuanYaHeiFont = null;
+	
+	private static final String FONT_PATH = "/root/apache-tomcat-7.0.85/webapps/resources_yzy/font/";
 
 	public static BaseFont getBaseFont() {
 		if (baseFont != null) {
 			return baseFont;
 		}
 		try {
-			baseFont = BaseFont.createFont("font/msyhbd.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			baseFont = BaseFont.createFont(FONT_PATH + "msyhbd.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -27,7 +29,7 @@ public class FontUtil {
 	public static Font getYaHeiFont(float size,int style) {
 		Font font = null;
 		try {
-			BaseFont bFont = BaseFont.createFont("font/msyhbd.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			BaseFont bFont = BaseFont.createFont(FONT_PATH + "msyhbd.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 			font = new Font(bFont, size, style == 1 ? Font.BOLD : Font.NORMAL);
 			font.setFamily("微软雅黑");
 		} catch (DocumentException e) {

@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;

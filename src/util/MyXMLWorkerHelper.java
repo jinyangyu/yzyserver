@@ -29,7 +29,6 @@ public class MyXMLWorkerHelper {
 
 		@Override
 		public Font getFont(final String fontname, String encoding, float size, final int style) {
-			System.out.println("font-name:" + fontname + " size:" + size + " style:" + style);
 			if (fontname != null) {
 				if ("STSong-Light".equals(fontname)) {
 					return FontUtil.getSongFont(size, style);

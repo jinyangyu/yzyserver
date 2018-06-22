@@ -34,7 +34,7 @@ import demo.HelloController;
 public class YzyConfig extends JFinalConfig {
 	public void configConstant(Constants me) {
 		PropKit.use("project_config.txt");
-
+		
 		me.setDevMode(PropKit.getBoolean("devMode", false));
 		me.setEncoding(PropKit.get("encoding"));
 
