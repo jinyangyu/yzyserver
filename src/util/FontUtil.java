@@ -23,6 +23,35 @@ public class FontUtil {
 		}
 		return baseFont;
 	}
+	
+	public static Font getYaHeiFont(float size,int style) {
+		Font font = null;
+		try {
+			BaseFont bFont = BaseFont.createFont("font/msyhbd.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			font = new Font(bFont, size, style == 1 ? Font.BOLD : Font.NORMAL);
+			font.setFamily("微软雅黑");
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return font;
+	}
+	
+	public static Font getSongFont(float size,int style) {
+		Font font = null;
+		try {
+			BaseFont bFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+			font = new Font(bFont, size, style == 1 ? Font.BOLD : Font.NORMAL);
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return font;
+	}
 
 	public static Font getWeiRuanYaHeiFont() {
 		if (weiRuanYaHeiFont != null) {

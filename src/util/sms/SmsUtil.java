@@ -59,7 +59,8 @@ public class SmsUtil {
 		request.setPhoneNumbers(phone);
 		// 必填:短信签名-可在短信控制台中找到
 //		request.setSignName("阿里云短信测试专用");
-		request.setSignName("河南道行信息科技有限公司");
+//		request.setSignName("河南道行信息科技有限公司");
+		request.setSignName("河南高考志愿填报助手");
 		
 		// 必填:短信模板-可在短信控制台中找到
 		request.setTemplateCode(templeteCode);

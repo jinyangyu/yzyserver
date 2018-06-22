@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -30,29 +28,12 @@ import com.itextpdf.tool.xml.ElementList;
 import com.jfinal.core.Controller;
 
 import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModel2;
 import bean.requestresult.CollegeChanceResult;
-import datasource.ChanceUtil;
-import datasource.DataSource;
-import datasource.SortAndFilter;
 import util.MyXMLWorkerHelper;
 
-public class PDFUtil extends Controller {
-	public static Logger logger1 = Logger.getLogger(PDFUtil.class);
-	
-	private List<CollegeModel> colleges;
-	private int score;
-	private boolean isWen;
-	private String userName;
-	private String pdfName;
-	
-	public PDFUtil(List<CollegeModel> colleges, int score, boolean isWen, String userName) {
-		this.colleges = colleges;
-		this.score = score;
-		this.isWen = isWen;
-		this.userName = userName;
-		
-		pdfName = System.currentTimeMillis() + "_" + score + ".pdf";
-	}
+public class PDFUtilDemo extends Controller {
+	public static Logger logger1 = Logger.getLogger(PDFUtilDemo.class);
 
 	public String createPDF() {
 
@@ -61,8 +42,7 @@ public class PDFUtil extends Controller {
 		rect.setBackgroundColor(BaseColor.WHITE);
 		Document document = new Document(rect, 0, 0, 0, 0);
 
-		String tmpPdfName = System.currentTimeMillis() + ".pdf";
-		File file = new File(tmpPdfName);
+		File file = new File("demo.pdf");
 		try {
 			// step 2
 			PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));
@@ -94,33 +74,21 @@ public class PDFUtil extends Controller {
 
 			System.out.println("finish");
 		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
+			// 第五步，关闭Document
 			document.close();
 		}
 		
-		// 为PDF添加水印
-		try {
-			manipulatePdf(tmpPdfName, pdfName);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (DocumentException e) {
-			e.printStackTrace();
-		}
-		
-		File pdfFile = new File(pdfName);
-		File tmpFile = new File(tmpPdfName);
-		if(pdfFile.exists()) {
-			tmpFile.delete();
-			return pdfName;	
-		}else if(tmpFile.exists()){
-			return tmpPdfName;	
-		}
 		return "";
+
 	}
 
 	private void createTable(PdfPTable table) throws IOException {
@@ -128,16 +96,24 @@ public class PDFUtil extends Controller {
 		table.addCell(getInfoCell());
 		table.addCell(getRankCell());
 
-		ChanceUtil chanceUtil = new ChanceUtil();
-		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges, isWen, score);
-		
-		// 对含概率的院校列表进行排序+筛选
-		SortAndFilter sortAndFilter = new SortAndFilter(chanceCollegeList, "probability", null, null, isWen);
-		chanceCollegeList = sortAndFilter.getResults();
-		Collections.reverse(chanceCollegeList);
-		
-		for (CollegeChanceResult chanceCollege: chanceCollegeList) {
-			table.addCell(getCollegeCell(chanceCollege.getCollege(), chanceCollege.getChance(), isWen));
+		CollegeModel2 college = new CollegeModel2();
+		college.setLogo("http://img.gaokaoq.com/college2/5948cbfc5b632.jpg");
+		college.setName("复旦大学");
+		college.setIs211(true);
+		college.setIs985(true);
+		college.setCollege_id("12311");
+		college.setProvince("上海");
+
+		college.setWen_2015("612");
+		college.setWen_2016("625");
+		college.setWen_2017("640");
+
+		college.setLi_2015("669");
+		college.setLi_2016("676");
+		college.setLi_2017("656");
+
+		for (int i = 0; i < 10; i++) {
+			table.addCell(getCollegeCell(college, 98, true));
 		}
 	}
 
@@ -195,22 +171,17 @@ public class PDFUtil extends Controller {
 		sb = new StringBuilder();
 		sb.append("<div>");
 		sb.append("<font style='color:black;font-size:20px;text-align:left;'>");
-		sb.append("查询人：");
-		sb.append(userName);
+		sb.append("查询人：于金洋");
 		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 		sb.append("查询分数：</font>");
-		sb.append("<font style='color:#ff4800;font-size:20px;'>");
-		sb.append(score);
-		sb.append("</font>");
+		sb.append("<font style='color:#ff4800;font-size:20px;'>475</font>");
 		sb.append("&nbsp;&nbsp;&nbsp;");
 		sb.append("<font style='color:#FA3C1B;font-size:20px; font-weight:bold; font-family:msyhbd;'>·</font>");
 		sb.append("&nbsp;");
-		sb.append("<font style='color:black;font-size:20px;'>");
-		sb.append(isWen ? "文科" : "理科");
-		sb.append("</font>");
+		sb.append("<font style='color:black;font-size:20px;'>理科</font>");
 		sb.append("</div>");
 
 		cell = new PdfPCell();
@@ -224,6 +195,7 @@ public class PDFUtil extends Controller {
 
 		list = MyXMLWorkerHelper.parseToElementList(sb.toString(), null);
 		for (Element element : list) {
+			System.out.println("add element");
 			cell.addElement(element);
 		}
 
@@ -273,25 +245,17 @@ public class PDFUtil extends Controller {
 		sb.append("<font style='color:#87868A;font-size:20px;'>");
 		sb.append("全省排名 &nbsp;&nbsp;</font>");
 
-		
-		
-		sb.append("<font style='color:#111111;font-size:20px;'>");
-		sb.append(DataSource.getInstance().get2017RankByScore(score, isWen));
-		sb.append("</font>");
+		sb.append("<font style='color:#111111;font-size:20px;'>12512</font>");
 		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2017年</font>");
 
 		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 
-		sb.append("<font style='color:#111111;font-size:20px;'>");
-		sb.append(DataSource.getInstance().get2016RankByScore(score, isWen));
-		sb.append("</font>");
+		sb.append("<font style='color:#111111;font-size:20px;'>13541</font>");
 		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2016年</font>");
 
 		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 
-		sb.append("<font style='color:#111111;font-size:20px;'>");
-		sb.append(DataSource.getInstance().get2015RankByScore(score, isWen));
-		sb.append("</font>");
+		sb.append("<font style='color:#111111;font-size:20px;'>11319</font>");
 		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2015年</font>");
 
 		sb.append("</div>");
@@ -326,7 +290,7 @@ public class PDFUtil extends Controller {
 
 	private static final int COLLEGE_CELL_HEIGHT = 80;
 
-	private PdfPCell getCollegeCell(CollegeModel college, int chance, boolean isWen) throws IOException {
+	private PdfPCell getCollegeCell(CollegeModel2 college, int chance, boolean isWen) throws IOException {
 		PdfPTable descTable = new PdfPTable(3);
 		descTable.setWidthPercentage(100.0f);
 
@@ -339,9 +303,8 @@ public class PDFUtil extends Controller {
 		PdfPCell cell = new PdfPCell();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<div style='width:100px; height:120px; padding-top:20px;'>");
-		sb.append("<img src='");
-		sb.append(college.getLogo());
-		sb.append("' style='width:80px; height:80px;'></img>");
+		sb.append(
+				"<img src='http://img.gaokaoq.com/college2/5948cbfc5b632.jpg' style='width:80px; height:80px;'></img>");
 		sb.append("</div>");
 
 		ElementList list = MyXMLWorkerHelper.parseToElementList(sb.toString(), null);
@@ -504,12 +467,8 @@ public class PDFUtil extends Controller {
 	public static final String IMG = "./water2.png";
 
 	public void manipulatePdf(String src, String dest) throws IOException, DocumentException {
-		
-		File destFile = new File(dest);
-		System.out.println(destFile.getAbsolutePath());
-		
 		PdfReader reader = new PdfReader(src);
-		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(destFile));
+		PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(dest));
 		Image image = Image.getInstance(IMG);
 		PdfImage stream = new PdfImage(image, "", null);
 		stream.put(new PdfName("ITXT_SpecialId"), new PdfName("123456789"));
@@ -535,17 +494,18 @@ public class PDFUtil extends Controller {
 	}
 
 	public static void main(String[] args) {
-//		PDFUtil util = new PDFUtil();
-//		util.createPDF();
-//
-//		// 为PDF添加水印
-//		try {
-//			util.manipulatePdf("demo.pdf", "water.pdf");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (DocumentException e) {
-//			e.printStackTrace();
-//		}
+		PDFUtilDemo util = new PDFUtilDemo();
+		util.createPDF();
+
+		// 为PDF添加水印
+		try {
+			util.manipulatePdf("demo.pdf", "water.pdf");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }

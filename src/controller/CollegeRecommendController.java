@@ -319,7 +319,7 @@ public class CollegeRecommendController extends Controller {
 		List<PrepayCountModel> prepayCounts = PrepayCountModel.dao
 				.find("select * from prepay_count where out_trade_no = ?", out_trade_no);
 
-		if (prepayCounts != null || prepayCounts.size() >= 1) {
+		if (prepayCounts.size() >= 1) {
 			logger1.info("此次支付的预购买记录已写入，此次手动查询支付结果重复");
 		} else {
 			logger1.info("手动查询支付结果，支付成功。微信支付结果推送慢了。写入此次购买的预购买次数");

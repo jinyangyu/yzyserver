@@ -13,6 +13,7 @@ public class YzyOrderModel extends Model<YzyOrderModel> {
 	private String phone;
 	private String time;
 	private String openid;
+	private String pdf;
 
 	private static final String id_NAME = "id";
 	private static final String out_trade_no_NAME = "out_trade_no";
@@ -22,6 +23,7 @@ public class YzyOrderModel extends Model<YzyOrderModel> {
 	private static final String phone_NAME = "phone";
 	private static final String time_NAME = "time";
 	private static final String openid_NAME = "openid";
+	private static final String pdf_NAME = "pdf";
 
 	public String getId() {
 		return getStr(id_NAME);
@@ -66,7 +68,7 @@ public class YzyOrderModel extends Model<YzyOrderModel> {
 	public void setExpertType() {
 		set(type_NAME, 2);
 	}
-	
+
 	public String getPhone() {
 		return getStr(phone_NAME);
 	}
@@ -89,6 +91,14 @@ public class YzyOrderModel extends Model<YzyOrderModel> {
 
 	public void setOpenid(String openid) {
 		set(openid_NAME, openid);
+	}
+
+	public String getPdf() {
+		return getStr(pdf_NAME);
+	}
+
+	public void setPdf(String pdf) {
+		set(pdf_NAME, pdf);
 	}
 
 }

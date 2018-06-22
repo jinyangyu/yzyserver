@@ -25,12 +25,12 @@ public class PaymentController extends Controller {
 
 	private static final int PAY_FOR_RECOMMEND = 1; // 院校推荐订单
 	private static final int PAY_FOR_EXPORT = 2; // 专家预约订单
-	private static final int PAY_FOR_PREPAY = 3900; // 39元预支付
+	private static final int PAY_FOR_PREPAY = 3; // 39元预支付
 	private UserInfoModel currentUser;
 
-	private static final int MONEY_RECOMMEND = 1;
-	private static final int MONEY_EXPORT = 2;
-	private static final int MONEY_PREPAY = 1;
+	private static final int MONEY_RECOMMEND = 4900;
+	private static final int MONEY_EXPORT = 698000;
+	private static final int MONEY_PREPAY = 3900;
 
 	private int fee = MONEY_RECOMMEND;
 

@@ -21,48 +21,56 @@ import com.itextpdf.tool.xml.pipeline.html.HtmlPipeline;
 import com.itextpdf.tool.xml.pipeline.html.HtmlPipelineContext;
 
 public class MyXMLWorkerHelper {
-	
-	
-    public static class MyFontsProvider extends XMLWorkerFontProvider {
-        public MyFontsProvider() {
-            super(null, null);
-        }
 
-        @Override
-        public Font getFont(final String fontname, String encoding, float size, final int style) {
-            return FontUtil.getITextSong();
-        }
-    }
+	public static class MyFontsProvider extends XMLWorkerFontProvider {
+		public MyFontsProvider() {
+			super(null, null);
+		}
 
-    public static ElementList parseToElementList(String html, String css) throws IOException {
-        // CSS
-        CSSResolver cssResolver = new StyleAttrCSSResolver();
-        if (css != null) {
-            CssFile cssFile = XMLWorkerHelper.getCSS(new ByteArrayInputStream(css.getBytes()));
-            cssResolver.addCss(cssFile);
-        }
+		@Override
+		public Font getFont(final String fontname, String encoding, float size, final int style) {
+			System.out.println("font-name:" + fontname + " size:" + size + " style:" + style);
+			if (fontname != null) {
+				if ("STSong-Light".equals(fontname)) {
+					return FontUtil.getSongFont(size, style);
+				}
+				if ("msyhbd".equals(fontname)) {
+					return FontUtil.getYaHeiFont(size, style);
+				}
+			}
+			return FontUtil.getSongFont(size, style);
+		}
+	}
 
-        // HTML
-        MyFontsProvider fontProvider = new MyFontsProvider();
-        CssAppliers cssAppliers = new CssAppliersImpl(fontProvider);
-        HtmlPipelineContext htmlContext = new HtmlPipelineContext(cssAppliers);
-        htmlContext.setTagFactory(Tags.getHtmlTagProcessorFactory());
-        htmlContext.autoBookmark(false);
+	public static ElementList parseToElementList(String html, String css) throws IOException {
+		// CSS
+		CSSResolver cssResolver = new StyleAttrCSSResolver();
+		if (css != null) {
+			CssFile cssFile = XMLWorkerHelper.getCSS(new ByteArrayInputStream(css.getBytes()));
+			cssResolver.addCss(cssFile);
+		}
 
-        // Pipelines
-        ElementList elements = new ElementList();
-        ElementHandlerPipeline end = new ElementHandlerPipeline(elements, null);
-        HtmlPipeline htmlPipeline = new HtmlPipeline(htmlContext, end);
-        CssResolverPipeline cssPipeline = new CssResolverPipeline(cssResolver, htmlPipeline);
+		// HTML
+		MyFontsProvider fontProvider = new MyFontsProvider();
+		CssAppliers cssAppliers = new CssAppliersImpl(fontProvider);
+		HtmlPipelineContext htmlContext = new HtmlPipelineContext(cssAppliers);
+		htmlContext.setTagFactory(Tags.getHtmlTagProcessorFactory());
+		htmlContext.autoBookmark(false);
 
-        // XML Worker
-        XMLWorker worker = new XMLWorker(cssPipeline, true);
-        XMLParser p = new XMLParser(worker);
-        html = html.replace("<br>", "").replace("<hr>", "").replace("<img>", "").replace("<param>", "")
-                .replace("<link>", "");
-        p.parse(new ByteArrayInputStream(html.getBytes()));
+		// Pipelines
+		ElementList elements = new ElementList();
+		ElementHandlerPipeline end = new ElementHandlerPipeline(elements, null);
+		HtmlPipeline htmlPipeline = new HtmlPipeline(htmlContext, end);
+		CssResolverPipeline cssPipeline = new CssResolverPipeline(cssResolver, htmlPipeline);
 
-        return elements;
-    }
+		// XML Worker
+		XMLWorker worker = new XMLWorker(cssPipeline, true);
+		XMLParser p = new XMLParser(worker);
+		html = html.replace("<br>", "").replace("<hr>", "").replace("<img>", "").replace("<param>", "")
+				.replace("<link>", "");
+		p.parse(new ByteArrayInputStream(html.getBytes()));
+
+		return elements;
+	}
 
 }

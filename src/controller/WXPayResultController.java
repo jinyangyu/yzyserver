@@ -124,7 +124,7 @@ public class WXPayResultController extends Controller {
 		List<PrepayCountModel> prepayCounts = PrepayCountModel.dao
 				.find("select * from prepay_count where out_trade_no = ?", out_trade_no);
 
-		if (prepayCounts != null || prepayCounts.size() >= 1) {
+		if (prepayCounts.size() >= 1) {
 			logger1.info("微信推送支付结果，支付成功。此次支付的预购买记录已写入，说明支付后，快速点击了院校推荐，那里手动查询了微信支付结果。此次推送结果滞后。不写入预购次数");
 		} else {
 			logger1.info("微信推送支付结果，支付成功。写入预购次数");
@@ -138,4 +138,5 @@ public class WXPayResultController extends Controller {
 			prepayModel.save();
 		}
 	}
+	
 }
