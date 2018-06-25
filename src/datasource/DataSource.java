@@ -16,6 +16,9 @@ public class DataSource {
 	private static DataSource dataSource = new DataSource();
 	private List<CollegeModel> allColleges;
 
+	private List<ScoreRankModel> li_2018_ScoreRanks;
+	private List<ScoreRankModel> wen_2018_ScoreRanks;
+	
 	private List<ScoreRankModel> li_2017_ScoreRanks;
 	private List<ScoreRankModel> wen_2017_ScoreRanks;
 
@@ -46,6 +49,11 @@ public class DataSource {
 		// logger1.info(
 		// allColleges.get(i).getId() + "--" + allColleges.get(i).getName());
 		// }
+		
+		li_2018_ScoreRanks = ScoreRankModel.dao
+				.find("select * from scores where year=2018 and wenli=? order by score desc", "li");
+		wen_2018_ScoreRanks = ScoreRankModel.dao
+				.find("select * from scores where year=2018 and wenli=? order by score desc", "wen");
 
 		li_2017_ScoreRanks = ScoreRankModel.dao
 				.find("select * from scores where year=2017 and wenli=? order by score desc", "li");
@@ -91,17 +99,17 @@ public class DataSource {
 		logger1.info("recommendCollege recommendScore:" + recommendScore);
 
 		if (isWen) {
-			return recommendSource_wen.recommendCollege(score);
+			return recommendSource_wen.recommendCollege(recommendScore);
 		}
-		return recommendSource_li.recommendCollege(score);
+		return recommendSource_li.recommendCollege(recommendScore);
 	}
 
 	/*
 	 * 根据当年排名，查询去年（2017）年该排名对应的分数 以去年对应的分数查询相应推荐院校
 	 */
-	private int getRecommendScore(int score, boolean isWen) {
+	public int getRecommendScore(int score, boolean isWen) {
 
-		int rank = get2017RankByScore(score, isWen);
+		int rank = get2018RankByScore(score, isWen);
 		logger1.info("recommendCollege score To rank:" + rank);
 
 		List<ScoreRankModel> scores;
@@ -110,7 +118,7 @@ public class DataSource {
 		for (ScoreRankModel scoreRank : scores) {
 			// logger1.info("recommendCollege scoreRank:" + scoreRank.getRank() + " rank:" +
 			// rank);
-			if (scoreRank.getRank() >= rank) {
+			if (scoreRank.getCount() >= rank) {
 				// logger1.info("recommendCollege rank To score:" + scoreRank.getScore());
 				return scoreRank.getScore();
 			}
@@ -118,6 +126,22 @@ public class DataSource {
 		return score;
 	}
 
+	/*
+	 * 通过当年分数，查询当年排名
+	 */
+	public int get2018RankByScore(int score, boolean isWen) {
+
+		List<ScoreRankModel> scores;
+		scores = isWen ? wen_2018_ScoreRanks : li_2018_ScoreRanks;
+
+		for (ScoreRankModel rank : scores) {
+			if (rank.getScore() <= score) {
+				return rank.getCount();
+			}
+		}
+		return -1;
+	}
+	
 	/*
 	 * 通过当年分数，查询当年排名
 	 */

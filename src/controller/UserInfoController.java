@@ -76,7 +76,7 @@ public class UserInfoController extends Controller {
 			userinfo.setSessionKey(session_key);
 			userinfo.setClientSession(clientSession);
 			
-			logger1.info("user update:" + userinfo.toString());
+			logger1.info("user save:" + userinfo.toString());
 			userinfo.save();
 		}
 		renderJson(new Result(ResultCode.SUCCESS, "success", clientSession));

@@ -41,7 +41,7 @@ public class MyOrdersController extends Controller {
 		}
 
 		String openid = currentUser.getOpenid();
-		List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find("select * from orders_yzy where openid = ?", openid);
+		List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find("select * from orders_yzy where openid = ? order by time desc", openid);
 
 		logger1.info("返回订单信息");
 

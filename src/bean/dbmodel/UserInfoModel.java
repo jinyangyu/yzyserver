@@ -1,9 +1,15 @@
 package bean.dbmodel;
 
+import java.io.UnsupportedEncodingException;
+
+import org.apache.commons.codec.binary.Base64;
+
 import com.jfinal.plugin.activerecord.Model;
 
 public class UserInfoModel extends Model<UserInfoModel> {
 	public static final UserInfoModel dao = new UserInfoModel().dao();
+
+	private static final String UTF_8 = "UTF-8";
 
 	private String id;
 	private String nickName;
@@ -42,11 +48,23 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	}
 
 	public String getNickName() {
-		return getStr(nickName_NAME);
+		String nickName = getStr(nickName_NAME);
+		if (Base64.isBase64(nickName)) {
+			try {
+				nickName = new String(Base64.decodeBase64(nickName.getBytes(UTF_8)), UTF_8);
+			} catch (UnsupportedEncodingException e) {
+			}
+		}
+		return nickName;
 	}
 
-	public void setNickName(String nickName) {
-		this.nickName = nickName;
+	public void setNickName(String _nickName) {
+		try {
+			_nickName = new String(Base64.encodeBase64(_nickName.getBytes(UTF_8)), UTF_8);
+        } catch (UnsupportedEncodingException e) {
+        }
+		
+		this.nickName = _nickName;
 		set(nickName_NAME, nickName);
 	}
 
@@ -129,7 +147,7 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	public void setPdfPath(String pdfPath) {
 		set(pdfPath_NAME, pdfPath);
 	}
-	
+
 	public String getQrcode() {
 		return getStr(qrcode_NAME);
 	}
@@ -140,10 +158,11 @@ public class UserInfoModel extends Model<UserInfoModel> {
 
 	@Override
 	public String toString() {
-		return "UserInfoModel [id=" + id + ", nickName=" + nickName + ", avatarUrl=" + avatarUrl + ", gender=" + gender
-				+ ", city=" + city + ", province=" + province + ", country=" + country + ", language=" + language
-				+ ", openid=" + openid + ", sessionKey=" + sessionKey + ", clientSession=" + clientSession
-				+ ", pdfPath=" + pdfPath + ", qrcode=" + qrcode + "]";
+		return "UserInfoModel [id=" + id + ", nickName=" + getNickName() + ", avatarUrl=" + getAvatarUrl() + ", gender="
+				+ getGender() + ", city=" + getCity() + ", province=" + getProvince() + ", country=" + getCountry()
+				+ ", language=" + getLanguage() + ", openid=" + getOpenid() + ", sessionKey=" + getSessionKey()
+				+ ", clientSession=" + getClientSession() + ", pdfPath=" + getPdfPath() + ", qrcode=" + getQrcode()
+				+ "]";
 	}
 
 }

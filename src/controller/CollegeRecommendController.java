@@ -50,14 +50,13 @@ public class CollegeRecommendController extends Controller {
 	private int pageSize = DEFAULT_PAGE_SIZE;
 	private int pageNum = 0;
 
-	boolean checkOrder = false;
-
 	public void recommend() {
 
 		String scoreStr = getPara("score");
 		subject = getPara("subject");
 		String clientSession = getPara("clientSession");
 		String out_trade_no = getPara("out_trade_no");
+		String check = getPara("check");
 		int recommendType = 0;
 
 		try {
@@ -119,7 +118,7 @@ public class CollegeRecommendController extends Controller {
 			return;
 		}
 
-		if (checkOrder || recommendType == RECOMMEND_USE_PREPAY) {
+//		if ("true".equals(check)) {
 			List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find(
 					"select * from orders_yzy where out_trade_no = ? and type = 1 and openid = ?", out_trade_no,
 					user.getOpenid());
@@ -136,11 +135,9 @@ public class CollegeRecommendController extends Controller {
 				logger1.info("新查询订单，开始检查支付结果");
 				startRecommendByCheckWxOrder(out_trade_no, user, score, isWen);
 			}
-		} else {
-			doRecommendByScore(score, isWen);
-		}
-
-		// doRecommendByScore(score, isWen);
+//		} else {
+//			doRecommendByScore(score, isWen);
+//		}
 	}
 
 	private void startRecommendByCheckWxOrder(String out_trade_no, UserInfoModel user, int score, boolean isWen) {
@@ -370,9 +367,10 @@ public class CollegeRecommendController extends Controller {
 				+ provinces);
 
 		// 填入录取概率
+		int recommendScore = DataSource.getInstance().getRecommendScore(score, isWen);
 		CollegeResult collegeResult = new CollegeResult();
 		ChanceUtil chanceUtil = new ChanceUtil();
-		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges_all, isWen, score);
+		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges_all, isWen, recommendScore);
 
 		// 对含概率的院校列表进行排序+筛选
 		SortAndFilter sortAndFilter = new SortAndFilter(chanceCollegeList, sortKey, filters, provinces, isWen);
@@ -410,11 +408,11 @@ public class CollegeRecommendController extends Controller {
 		if (!colleges_all.isEmpty()) {
 			List<RankResult> ranks = new ArrayList<RankResult>();
 			ranks.add(
+					new RankResult("2018", String.valueOf(DataSource.getInstance().get2018RankByScore(score, isWen))));
+			ranks.add(
 					new RankResult("2017", String.valueOf(DataSource.getInstance().get2017RankByScore(score, isWen))));
 			ranks.add(
 					new RankResult("2016", String.valueOf(DataSource.getInstance().get2016RankByScore(score, isWen))));
-			ranks.add(
-					new RankResult("2015", String.valueOf(DataSource.getInstance().get2015RankByScore(score, isWen))));
 			collegeResult.setRanks(ranks);
 		}
 

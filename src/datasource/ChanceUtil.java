@@ -30,6 +30,8 @@ public class ChanceUtil {
 				int diff = 0;
 				if (isWen) {
 					diff = score - Integer.parseInt(chanceResult.getCollege().getWen_2017());
+					
+					System.out.println("diff " + chanceResult.getCollege().getName() + "--" + chanceResult.getCollege().getWen_2017());
 				} else {
 					diff = score - Integer.parseInt(chanceResult.getCollege().getLi_2017());
 				}

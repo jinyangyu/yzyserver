@@ -129,7 +129,8 @@ public class PDFUtil extends Controller {
 		table.addCell(getRankCell());
 
 		ChanceUtil chanceUtil = new ChanceUtil();
-		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges, isWen, score);
+		int recommendScore = DataSource.getInstance().getRecommendScore(score, isWen);
+		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges, isWen, recommendScore);
 
 		// 对含概率的院校列表进行排序+筛选
 		SortAndFilter sortAndFilter = new SortAndFilter(chanceCollegeList, "probability", null, null, isWen);
@@ -274,6 +275,13 @@ public class PDFUtil extends Controller {
 		sb.append("全省排名 &nbsp;&nbsp;</font>");
 
 		sb.append("<font style='color:#111111;font-size:20px;'>");
+		sb.append(DataSource.getInstance().get2018RankByScore(score, isWen));
+		sb.append("</font>");
+		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2018年</font>");
+
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+
+		sb.append("<font style='color:#111111;font-size:20px;'>");
 		sb.append(DataSource.getInstance().get2017RankByScore(score, isWen));
 		sb.append("</font>");
 		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2017年</font>");
@@ -284,13 +292,6 @@ public class PDFUtil extends Controller {
 		sb.append(DataSource.getInstance().get2016RankByScore(score, isWen));
 		sb.append("</font>");
 		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2016年</font>");
-
-		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-
-		sb.append("<font style='color:#111111;font-size:20px;'>");
-		sb.append(DataSource.getInstance().get2015RankByScore(score, isWen));
-		sb.append("</font>");
-		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2015年</font>");
 
 		sb.append("</div>");
 
