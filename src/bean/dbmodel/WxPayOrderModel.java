@@ -40,6 +40,8 @@ public class WxPayOrderModel extends Model<WxPayOrderModel> {
 	
 	// ----- 额外信息字段
 	private String extra;
+	private String scene;
+	private String time;
 
 	private static final String id_NAME = "id";
 
@@ -67,6 +69,8 @@ public class WxPayOrderModel extends Model<WxPayOrderModel> {
 	private static final String trade_state_desc_NAME = "trade_state_desc";
 	
 	private static final String extra_NAME = "extra";
+	private static final String scene_NAME = "scene";
+	private static final String time_NAME = "time";
 
 	public String getId() {
 		return getStr(id_NAME);
@@ -254,6 +258,22 @@ public class WxPayOrderModel extends Model<WxPayOrderModel> {
 	
 	public void setExtra(String extra) {
 		set(extra_NAME, extra);
+	}
+	
+	public String getScene() {
+		return getStr(scene_NAME);
+	}
+	
+	public void setScene(String scene) {
+		set(scene_NAME, scene);
+	}
+	
+	public String getTime() {
+		return getStr(time_NAME);
+	}
+
+	public void setTime(String time) {
+		set(time_NAME, time);
 	}
 
 	@Override

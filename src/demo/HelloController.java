@@ -47,49 +47,43 @@ public class HelloController extends Controller {
 		// List<CollegeModel> colleges =
 		// DataSource.getInstance().recommendCollege(100,true);
 
-//		 String result =
-//		 HttpKit.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="
-//		 + Configure.getAppID()
-//		 + "&secret=" + Configure.getSecret());
+		// String result =
+		// HttpKit.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="
+		// + Configure.getAppID()
+		// + "&secret=" + Configure.getSecret());
 
 		/*
-		 {
-			"data": "{\"access_token\":\"9_3ef7d4Kqv1To5ZtZi3wo79kFOhGalh-pm-4FHEXsWzkYLSoLIiN622A_P1Hq4fp-kplXeY1Tsv36SJ5cbX_4H9PaZgCCK3g7vwASCNe52gH5_VN5HG505ddh6f3MmAAckenQnMhamR7q12HbOSKbAEADHZ\",\"expires_in\":7200}",
-			"result_code": 200,
-			"result_msg": "query success"
-		 }
+		 * { "data":
+		 * "{\"access_token\":\"9_3ef7d4Kqv1To5ZtZi3wo79kFOhGalh-pm-4FHEXsWzkYLSoLIiN622A_P1Hq4fp-kplXeY1Tsv36SJ5cbX_4H9PaZgCCK3g7vwASCNe52gH5_VN5HG505ddh6f3MmAAckenQnMhamR7q12HbOSKbAEADHZ\",\"expires_in\":7200}",
+		 * "result_code": 200, "result_msg": "query success" }
 		 */
 
 		String token = "10_sSKuvsW1HizYR7_wy4PeZDdgwVFmKvJYYsamUatfcFjl9p3zxHyJeDL_-qTvqcgJD8PSrc4gQFyXPyEwpNtp4Sir0fkfC6pamekEJTgrAm_z92MT_iTynGLilqvpHWdTdLXf8haddn3crRh_GQWjAJAUEK";
 
-		
-		for(int i=2000;i<3000;i++) {
+		for (int i = 2000; i < 3000; i++) {
 			createQrCode(token, i);
 		}
-		
 
 		renderJson(new Result(200, "query success", ""));
 	}
-	
+
 	private void createQrCode(String token, int number) {
 		HashMap<String, Object> queryParas = new HashMap<String, Object>();
 		queryParas.put("scene", "tuiguang_" + number);
 		queryParas.put("page", "pages/index/index");
 		queryParas.put("width", "430");
 		queryParas.put("auto_color", true);
-		
-		
 
 		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
 		HttpPost httpPost = new HttpPost("https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + token);
 		httpPost.addHeader("content-type", "application/json");
 		String body = JSON.toJSONString(queryParas);
-		
+
 		System.out.println(body);
-		
+
 		StringEntity entity;
-		
+
 		String result = "";
 		try {
 			entity = new StringEntity(body);
@@ -101,13 +95,14 @@ public class HelloController extends Controller {
 
 			response = httpClient.execute(httpPost);
 			InputStream inputStream = response.getEntity().getContent();
-			
-//			File codeFile = new File("/root/apache-tomcat-7.0.85/webapps/yzyserver/yujinyang_code.png");
-			
+
+			// File codeFile = new
+			// File("/root/apache-tomcat-7.0.85/webapps/yzyserver/yujinyang_code.png");
+
 			String qrFileName = "/Users/yujinyang11/Desktop/app_code_2000_3000/豫志愿推广二维码_" + number + ".png";
-			
+
 			File codeFile = new File(qrFileName);
-			
+
 			FileOutputStream out = new FileOutputStream(codeFile);
 
 			byte[] buffer = new byte[8192];
@@ -118,17 +113,22 @@ public class HelloController extends Controller {
 
 			out.flush();
 			out.close();
-			
+
 			System.out.println("成功生成 " + qrFileName);
 		} catch (Exception e) {
 			result = e.getMessage();
 			e.printStackTrace();
 		}
 	}
-	
+
+	public void resetAdmins() {
+		DataSource.getInstance().resetAdmin();
+		renderJson(new Result(200, "重新加载管理员成功", ""));
+	}
+
 	public void setRank() {
 		List<CollegeModel> allCollege = DataSource.getInstance().getAllColleges();
-		
+
 		for (CollegeModel model : allCollege) {
 			int li_2015 = 0;
 			int li_2016 = 0;
@@ -187,11 +187,21 @@ public class HelloController extends Controller {
 			model.update();
 		}
 	}
-	
+
 	public void clearRecommendCache() {
 		renderHtml(DataSource.getInstance().clearRecommendCache());
 	}
 	
+	public void resetShouldUserNotify() {
+		DataSource.getInstance().resetNotifyedUser();
+		renderJson(new Result(200, "重置成功", null));
+	}
+	
+	public void resetInfo() {
+		DataSource.getInstance().resetInfoUser();
+		renderJson(new Result(200, "重置成功", DataSource.getInstance().getInfoUser()));
+	}
+
 	public void sendSMS() {
 		try {
 			SmsUtil.sendSms("SMS_130815233", "18210512166", "{\"code\":\"" + String.valueOf(444232) + "\"}");

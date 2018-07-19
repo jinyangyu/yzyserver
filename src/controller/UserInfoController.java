@@ -15,6 +15,7 @@ import bean.dbmodel.UserInfoModel;
 import bean.requestresult.Result;
 import constant.Configure;
 import constant.ResultCode;
+import util.TimeUtil;
 
 public class UserInfoController extends Controller {
 	public static Logger logger1 = Logger.getLogger(UserInfoController.class);
@@ -24,6 +25,7 @@ public class UserInfoController extends Controller {
 
 		String jsCode = getPara("js_code");
 		String loginInfo = "";
+		String scene = "unknown";
 		
 		try {
 			loginInfo = URLDecoder.decode(getPara("loginInfo"),"UTF-8");
@@ -35,6 +37,11 @@ public class UserInfoController extends Controller {
 		
 		logger1.info("jsCode:" + jsCode);
 		logger1.info("loginInfo:" + loginInfo);
+		
+		String sceneStr = getPara("scene");
+		if(sceneStr != null && !"".equals(sceneStr)) {
+			scene = sceneStr;
+		}
 
 		// {"session_key":"fa3BBl\/cf1Bv6WwLZgpb2w==","openid":"o4GPD5O_aVdtrrZJvDMQ-WL3hDUI"}
 		// openid 用户唯一标识
@@ -75,6 +82,8 @@ public class UserInfoController extends Controller {
 			userinfo.setOpenid(openid);
 			userinfo.setSessionKey(session_key);
 			userinfo.setClientSession(clientSession);
+			userinfo.setTime(TimeUtil.getCurrentTime(TimeUtil.FORMAT_DATE_TIME));
+			userinfo.setScene(scene);
 			
 			logger1.info("user save:" + userinfo.toString());
 			userinfo.save();

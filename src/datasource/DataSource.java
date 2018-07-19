@@ -2,11 +2,16 @@ package datasource;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import bean.dbmodel.AdminOpenid;
 import bean.dbmodel.CollegeModel;
+import bean.dbmodel.Info;
+import bean.dbmodel.InfoUserCheck;
 import bean.dbmodel.ScoreRankModel;
 import controller.CollegeRecommendController;
 
@@ -18,7 +23,7 @@ public class DataSource {
 
 	private List<ScoreRankModel> li_2018_ScoreRanks;
 	private List<ScoreRankModel> wen_2018_ScoreRanks;
-	
+
 	private List<ScoreRankModel> li_2017_ScoreRanks;
 	private List<ScoreRankModel> wen_2017_ScoreRanks;
 
@@ -31,6 +36,11 @@ public class DataSource {
 	private IRecommendSource recommendSource_li;
 	private IRecommendSource recommendSource_wen;
 
+	private HashSet<String> adminMap;
+	private HashSet<String> notifyedUserMap;
+
+	private Info infoUser;
+
 	private DataSource() {
 		logger1.info("DataSource init");
 		long start = System.currentTimeMillis();
@@ -39,17 +49,10 @@ public class DataSource {
 						+ "master_program_count,belong,academician_count,student_count,telephone,"
 						+ "address,official_website,enrolment_website,logo," + "wen_2017,wen_2016,wen_2015,"
 						+ "li_2017,li_2016,li_2015,province,college_id," + "li_2017_rank,li_2016_rank,li_2015_rank,"
-						+ "wen_2017_rank,wen_2016_rank,wen_2015_rank " + "from college"
-		// + " where id < 1000"
-		);
+						+ "wen_2017_rank,wen_2016_rank,wen_2015_rank " + "from college");
 
 		logger1.info("DataSource init colleges use:" + (System.currentTimeMillis() - start) + " ms");
 
-		// for (int i = 0; i < allColleges.size(); i++) {
-		// logger1.info(
-		// allColleges.get(i).getId() + "--" + allColleges.get(i).getName());
-		// }
-		
 		li_2018_ScoreRanks = ScoreRankModel.dao
 				.find("select * from scores where year=2018 and wenli=? order by score desc", "li");
 		wen_2018_ScoreRanks = ScoreRankModel.dao
@@ -83,6 +86,60 @@ public class DataSource {
 
 		logger1.info("DataSource init colleges sort by li_2017 use:" + (System.currentTimeMillis() - start) + " ms");
 
+		resetAdmin();
+		resetInfoUser();
+		resetNotifyedUser();
+	}
+
+	public void resetNotifyedUser() {
+		if (notifyedUserMap == null) {
+			notifyedUserMap = new HashSet<String>();
+		}
+		notifyedUserMap.clear();
+
+		List<InfoUserCheck> infos = InfoUserCheck.dao.find("select * from info_user_check");
+		for (InfoUserCheck info : infos) {
+			notifyedUserMap.add(info.getOpenid());
+		}
+	}
+
+	public boolean shouldUserNotify(String openId) {
+		boolean result = !notifyedUserMap.contains(openId);
+		if (result) {
+			notifyedUserMap.add(openId);
+			InfoUserCheck userCheck = new InfoUserCheck();
+			userCheck.setOpenid(openId);
+			userCheck.save();
+		}
+		return result;
+	}
+
+	public void resetInfoUser() {
+		List<Info> infos = Info.dao.find("select * from info");
+		if (infos != null && infos.size() > 0) {
+			infoUser = infos.get(0);
+		}
+	}
+
+	public Info getInfoUser() {
+		return infoUser;
+	}
+
+	public void resetAdmin() {
+		List<AdminOpenid> admins = AdminOpenid.dao.find("select * from admin_openid");
+
+		if (adminMap == null) {
+			adminMap = new HashSet<String>();
+		} else {
+			adminMap.clear();
+		}
+		for (AdminOpenid admin : admins) {
+			adminMap.add(admin.getOpenid());
+		}
+	}
+
+	public boolean isAdmin(String openId) {
+		return adminMap.contains(openId);
 	}
 
 	public static DataSource getInstance() {
@@ -141,7 +198,7 @@ public class DataSource {
 		}
 		return -1;
 	}
-	
+
 	/*
 	 * 通过当年分数，查询当年排名
 	 */

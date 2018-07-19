@@ -24,6 +24,8 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	private String clientSession;
 	private String pdfPath;
 	private String qrcode;
+	private String time;
+	private String scene;
 
 	private static final String id_NAME = "id";
 	private static final String nickName_NAME = "nickName";
@@ -38,6 +40,8 @@ public class UserInfoModel extends Model<UserInfoModel> {
 	private static final String clientSession_NAME = "clientSession";
 	private static final String pdfPath_NAME = "pdfPath";
 	private static final String qrcode_NAME = "qrcode";
+	private static final String time_NAME = "time";
+	private static final String scene_NAME = "scene";
 
 	public String getId() {
 		return id;
@@ -154,6 +158,22 @@ public class UserInfoModel extends Model<UserInfoModel> {
 
 	public void setQrcode(String qrcode) {
 		set(qrcode_NAME, qrcode);
+	}
+	
+	public String getTime() {
+		return getStr(time_NAME);
+	}
+
+	public void setTime(String time) {
+		set(time_NAME, time);
+	}
+	
+	public String getScene() {
+		return getStr(scene_NAME);
+	}
+	
+	public void setScene(String scene) {
+		set(scene_NAME, scene);
 	}
 
 	@Override

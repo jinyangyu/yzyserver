@@ -8,8 +8,11 @@ import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 
+import bean.dbmodel.AdminOpenid;
 import bean.dbmodel.ChanceCacheModel;
 import bean.dbmodel.CollegeModel;
+import bean.dbmodel.Info;
+import bean.dbmodel.InfoUserCheck;
 import bean.dbmodel.PrepayCountModel;
 import bean.dbmodel.QrCodeModel;
 import bean.dbmodel.ScoreRankModel;
@@ -21,6 +24,7 @@ import controller.CollegePDFController;
 import controller.CollegeRecommendController;
 import controller.SmsVerifyController;
 import controller.ExpertPaySuccessController;
+import controller.InfoCheckController;
 import controller.MyOrdersController;
 import controller.PaymentController;
 import controller.PrepayCountVerifyController;
@@ -68,6 +72,8 @@ public class YzyConfig extends JFinalConfig {
 		System.out.println("configRoute QRCodeBindController");
 		me.add("/prepaycount", PrepayCountVerifyController.class);
 		System.out.println("configRoute PrepayCountVerifyController");
+		me.add("/info", InfoCheckController.class);
+		System.out.println("configRoute InfoCheckController");
 	}
 
 	public void configEngine(Engine me) {
@@ -93,6 +99,9 @@ public class YzyConfig extends JFinalConfig {
 		arp.addMapping("chance_cache", ChanceCacheModel.class);
 		arp.addMapping("qrcode", QrCodeModel.class);
 		arp.addMapping("prepay_count", PrepayCountModel.class);
+		arp.addMapping("admin_openid", AdminOpenid.class);
+		arp.addMapping("info_user_check", InfoUserCheck.class);
+		arp.addMapping("info", Info.class);
 		arp.setShowSql(true);
 	}
 

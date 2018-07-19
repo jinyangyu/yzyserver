@@ -3,10 +3,10 @@ package controller;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;
 
-import bean.dbmodel.PrepayCountModel;
 import bean.dbmodel.UserInfoModel;
 import bean.dbmodel.WxPayOrderModel;
 import bean.requestinfo.PrepayOrderInfo;
@@ -15,10 +15,12 @@ import bean.requestresult.PrepayResult;
 import bean.requestresult.Result;
 import constant.Configure;
 import constant.ResultCode;
+import datasource.DataSource;
 import util.HttpRequest;
 import util.MD5;
 import util.RandomStringGenerator;
 import util.Signature;
+import util.TimeUtil;
 
 public class PaymentController extends Controller {
 	public static Logger logger1 = Logger.getLogger(PaymentController.class);
@@ -36,10 +38,18 @@ public class PaymentController extends Controller {
 
 	private WxPayOrderModel wxOrderModel;
 
+	//小程序场景值 https://developers.weixin.qq.com/miniprogram/dev/framework/app-service/scene.html
+	private String scene = "unknown";
+
 	public void recommend() {
 
 		String clientSession = getPara("clientSession");
-		logger1.info("clientSession:" + clientSession);
+		String sceneStr = getPara("scene");
+		if(sceneStr != null && !"".equals(sceneStr)) {
+			scene = sceneStr;
+		}
+		
+		logger1.info("clientSession:" + clientSession + " scene:" + scene);
 
 		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where clientSession = ?",
 				clientSession);
@@ -67,10 +77,15 @@ public class PaymentController extends Controller {
 		}
 
 		wxOrderModel = new WxPayOrderModel();
+		wxOrderModel.setScene(scene);
+		wxOrderModel.setTime(TimeUtil.getCurrentTime(TimeUtil.FORMAT_DATE_TIME));
 
 		if (payType == PAY_FOR_RECOMMEND) {
 			wxOrderModel.setPayTypeRecommend();
 			fee = MONEY_RECOMMEND;
+			if(DataSource.getInstance().isAdmin(currentUser.getOpenid())) {
+				fee = 1;
+			}
 		} else if (payType == PAY_FOR_EXPORT) {
 			wxOrderModel.setPayTypeExpert();
 			fee = MONEY_EXPORT;
