@@ -173,7 +173,7 @@ public class DataSource {
 	}
 
 	public List<CollegeModelAll> recommendCollege(int score, boolean isWen) {
-		// 得到2017年对应排名的分数，以此查询提档线数据，给出推荐院校
+		// 得到2018年对应排名的分数，以此查询提档线数据，给出推荐院校
 		int recommendScore = getRecommendScore(score, isWen);
 		logger1.info("recommendCollege recommendScore:" + recommendScore);
 
@@ -196,12 +196,12 @@ public class DataSource {
 		logger1.info("recommendCollege score To rank:" + rank);
 
 		List<ScoreRankModel> scores;
-		scores = isWen ? wen_2017_ScoreRanks : li_2017_ScoreRanks;
+		scores = isWen ? wen_2018_ScoreRanks : li_2018_ScoreRanks;
 
 		for (ScoreRankModel scoreRank : scores) {
 			// logger1.info("recommendCollege scoreRank:" + scoreRank.getRank() + " rank:" +
 			// rank);
-			if (scoreRank.getRank() >= rank) {
+			if (scoreRank.getCount() >= rank) {
 				// logger1.info("recommendCollege rank To score:" + scoreRank.getScore());
 				return scoreRank.getScore();
 			}
@@ -219,26 +219,7 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getRank();
-			}
-		}
-		return -1;
-	}
-
-	/*
-	 * 通过当年分数，查询当年排名
-	 */
-	public int get2018RankCountByScore(int score, boolean isWen) {
-
-		List<ScoreRankModel> scores;
-		scores = isWen ? wen_2018_ScoreRanks : li_2018_ScoreRanks;
-
-		int rankCount = 0;
-		for (ScoreRankModel rank : scores) {
-			if (rank.getScore() <= score) {
-				return rankCount;
-			} else {
-				rankCount += rank.getCount();
+				return rank.getCount();
 			}
 		}
 		return -1;
@@ -254,26 +235,7 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getRank();
-			}
-		}
-		return -1;
-	}
-
-	/*
-	 * 通过当年分数，查询当年排名
-	 */
-	public int get2017RankCountByScore(int score, boolean isWen) {
-
-		List<ScoreRankModel> scores;
-		scores = isWen ? wen_2017_ScoreRanks : li_2017_ScoreRanks;
-
-		int rankCount = 0;
-		for (ScoreRankModel rank : scores) {
-			if (rank.getScore() <= score) {
-				return rankCount;
-			} else {
-				rankCount += rank.getCount();
+				return rank.getCount();
 			}
 		}
 		return -1;
@@ -289,26 +251,7 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getRank();
-			}
-		}
-		return -1;
-	}
-
-	/*
-	 * 通过当年分数，查询当年排名
-	 */
-	public int get2016RankCountByScore(int score, boolean isWen) {
-
-		List<ScoreRankModel> scores;
-		scores = isWen ? wen_2016_ScoreRanks : li_2016_ScoreRanks;
-
-		int rankCount = 0;
-		for (ScoreRankModel rank : scores) {
-			if (rank.getScore() <= score) {
-				return rankCount;
-			} else {
-				rankCount += rank.getCount();
+				return rank.getCount();
 			}
 		}
 		return -1;
@@ -324,26 +267,7 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getRank();
-			}
-		}
-		return -1;
-	}
-
-	/*
-	 * 通过当年分数，查询当年排名
-	 */
-	public int get2015RankCountByScore(int score, boolean isWen) {
-
-		List<ScoreRankModel> scores;
-		scores = isWen ? wen_2015_ScoreRanks : li_2015_ScoreRanks;
-
-		int rankCount = 0;
-		for (ScoreRankModel rank : scores) {
-			if (rank.getScore() <= score) {
-				return rankCount;
-			} else {
-				rankCount += rank.getCount();
+				return rank.getCount();
 			}
 		}
 		return -1;
@@ -352,7 +276,17 @@ public class DataSource {
 	public int get2018ScoreByRank(int rank, boolean isWen) {
 		List<ScoreRankModel> scoreRanks = isWen ? wen_2018_ScoreRanks : li_2018_ScoreRanks;
 		for (ScoreRankModel model : scoreRanks) {
-			if (model.getRank() >= rank) {
+			if (model.getCount() >= rank) {
+				return model.getScore();
+			}
+		}
+		return 0;
+	}
+
+	public int get2018ScoreByIndex(int index, boolean isWen) {
+		List<ScoreRankModel> scoreRanks = isWen ? wen_2018_ScoreRanks : li_2018_ScoreRanks;
+		for (ScoreRankModel model : scoreRanks) {
+			if (model.getRank() >= index) {
 				return model.getScore();
 			}
 		}

@@ -202,10 +202,10 @@ public class HelloController extends Controller {
 				}
 			}
 
-			model.setWen_2015_rank(DataSource.getInstance().get2015RankCountByScore(wen_2015, true));
-			model.setWen_2016_rank(DataSource.getInstance().get2016RankCountByScore(wen_2016, true));
-			model.setWen_2017_rank(DataSource.getInstance().get2017RankCountByScore(wen_2017, true));
-			model.setWen_2018_rank(DataSource.getInstance().get2018RankCountByScore(wen_2018, true));
+			model.setWen_2015_rank(DataSource.getInstance().get2015RankByScore(wen_2015, true));
+			model.setWen_2016_rank(DataSource.getInstance().get2016RankByScore(wen_2016, true));
+			model.setWen_2017_rank(DataSource.getInstance().get2017RankByScore(wen_2017, true));
+			model.setWen_2018_rank(DataSource.getInstance().get2018RankByScore(wen_2018, true));
 
 			model.update();
 		}

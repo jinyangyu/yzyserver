@@ -427,11 +427,11 @@ public class CollegeRecommendController extends Controller {
 		if (!colleges_all.isEmpty()) {
 			List<RankResult> ranks = new ArrayList<RankResult>();
 			ranks.add(new RankResult("2018",
-					String.valueOf(DataSource.getInstance().get2018RankCountByScore(score, isWen))));
+					String.valueOf(DataSource.getInstance().get2018RankByScore(score, isWen))));
 			ranks.add(new RankResult("2017",
-					String.valueOf(DataSource.getInstance().get2017RankCountByScore(score, isWen))));
+					String.valueOf(DataSource.getInstance().get2017RankByScore(score, isWen))));
 			ranks.add(new RankResult("2016",
-					String.valueOf(DataSource.getInstance().get2016RankCountByScore(score, isWen))));
+					String.valueOf(DataSource.getInstance().get2016RankByScore(score, isWen))));
 			collegeResult.setRanks(ranks);
 		}
 
