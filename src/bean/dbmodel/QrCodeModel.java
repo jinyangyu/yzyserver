@@ -8,11 +8,13 @@ public class QrCodeModel extends Model<QrCodeModel> {
 	private String id;
 	private String openid;
 	private String qrcode;
+	private String sharefrom;
 	private String time;
 
 	private static final String id_NAME = "id";
 	private static final String openid_NAME = "openid";
 	private static final String qrcode_NAME = "qrcode";
+	private static final String sharefrom_NAME = "sharefrom";
 	private static final String time_NAME = "time";
 
 	public String getId() {
@@ -45,6 +47,14 @@ public class QrCodeModel extends Model<QrCodeModel> {
 
 	public void setTime(String time) {
 		set(time_NAME, time);
+	}
+
+	public String getSharefrom() {
+		return getStr(sharefrom_NAME);
+	}
+
+	public void setSharefrom(String sharefrom) {
+		set(sharefrom_NAME, sharefrom);
 	}
 
 }

@@ -1,16 +1,16 @@
 package bean.requestresult;
 
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
 
 public class CollegeChanceResult {
-	private CollegeModel college;
+	private CollegeModelAll college;
 	private int chance;
 
-	public CollegeModel getCollege() {
+	public CollegeModelAll getCollege() {
 		return college;
 	}
 
-	public void setCollege(CollegeModel college) {
+	public void setCollege(CollegeModelAll college) {
 		this.college = college;
 	}
 

@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import com.jfinal.core.Controller;
 import com.thoughtworks.xstream.XStream;
 
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
 import bean.dbmodel.PrepayCountModel;
 import bean.dbmodel.UserInfoModel;
 import bean.dbmodel.WxPayOrderModel;
@@ -32,11 +32,13 @@ import constant.Configure;
 import constant.ResultCode;
 import datasource.ChanceUtil;
 import datasource.DataSource;
+import datasource.LiankaoDataSource;
 import datasource.SortAndFilter;
 import util.HttpRequest;
 import util.RandomStringGenerator;
 import util.Signature;
 
+//https://www.pornhub.com/playlist/90619961
 public class CollegeRecommendController extends Controller {
 	public static Logger logger1 = Logger.getLogger(CollegeRecommendController.class);
 
@@ -99,11 +101,6 @@ public class CollegeRecommendController extends Controller {
 			return;
 		}
 
-		if (out_trade_no == null || "".equals(out_trade_no)) {
-			renderJson(new Result(ResultCode.PARAMS_ERROR, "params out_trade_no invalid", null));
-			return;
-		}
-
 		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where clientSession = ?",
 				clientSession);
 		if (users == null || users.isEmpty()) {
@@ -118,7 +115,13 @@ public class CollegeRecommendController extends Controller {
 			return;
 		}
 
-//		if ("true".equals(check)) {
+		if ("true".equals(check)) {
+
+			if (out_trade_no == null || "".equals(out_trade_no)) {
+				renderJson(new Result(ResultCode.PARAMS_ERROR, "params out_trade_no invalid", null));
+				return;
+			}
+
 			List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find(
 					"select * from orders_yzy where out_trade_no = ? and type = 1 and openid = ?", out_trade_no,
 					user.getOpenid());
@@ -135,9 +138,9 @@ public class CollegeRecommendController extends Controller {
 				logger1.info("新查询订单，开始检查支付结果");
 				startRecommendByCheckWxOrder(out_trade_no, user, score, isWen);
 			}
-//		} else {
-//			doRecommendByScore(score, isWen);
-//		}
+		} else {
+			doRecommendByScore(score, isWen);
+		}
 	}
 
 	private void startRecommendByCheckWxOrder(String out_trade_no, UserInfoModel user, int score, boolean isWen) {
@@ -333,8 +336,24 @@ public class CollegeRecommendController extends Controller {
 	}
 
 	private void doRecommendByScore(int score, boolean isWen) {
-		List<CollegeModel> colleges_all = DataSource.getInstance().recommendCollege(score, isWen);
-		logger1.info("doRecommendByScore colleges_all:" + colleges_all.size());
+		List<CollegeModelAll> colleges_all = null;
+
+		int liankao_id = 0;
+		try {
+			liankao_id = getParaToInt("liankao_id");
+		} catch (Exception e) {
+		}
+
+		int recommendScore = 0;
+		if (liankao_id > 0) {
+			// 联考推荐
+			recommendScore = LiankaoDataSource.getInstance().getLiankaoRecommendScore(liankao_id, score, isWen);
+			colleges_all = DataSource.getInstance().recommendCollegeByScore(recommendScore, isWen);
+		} else {
+			recommendScore = DataSource.getInstance().getRecommendScore(score, isWen);
+			colleges_all = DataSource.getInstance().recommendCollege(score, isWen);
+			logger1.info("doRecommendByScore colleges_all:" + colleges_all.size());
+		}
 
 		String sortKey = getPara("sort");
 		String filters = getPara("filters");
@@ -367,10 +386,10 @@ public class CollegeRecommendController extends Controller {
 				+ provinces);
 
 		// 填入录取概率
-		int recommendScore = DataSource.getInstance().getRecommendScore(score, isWen);
 		CollegeResult collegeResult = new CollegeResult();
 		ChanceUtil chanceUtil = new ChanceUtil();
-		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges_all, isWen, recommendScore);
+		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges_all, isWen, recommendScore,
+				liankao_id);
 
 		// 对含概率的院校列表进行排序+筛选
 		SortAndFilter sortAndFilter = new SortAndFilter(chanceCollegeList, sortKey, filters, provinces, isWen);
@@ -407,12 +426,12 @@ public class CollegeRecommendController extends Controller {
 
 		if (!colleges_all.isEmpty()) {
 			List<RankResult> ranks = new ArrayList<RankResult>();
-			ranks.add(
-					new RankResult("2018", String.valueOf(DataSource.getInstance().get2018RankByScore(score, isWen))));
-			ranks.add(
-					new RankResult("2017", String.valueOf(DataSource.getInstance().get2017RankByScore(score, isWen))));
-			ranks.add(
-					new RankResult("2016", String.valueOf(DataSource.getInstance().get2016RankByScore(score, isWen))));
+			ranks.add(new RankResult("2018",
+					String.valueOf(DataSource.getInstance().get2018RankCountByScore(score, isWen))));
+			ranks.add(new RankResult("2017",
+					String.valueOf(DataSource.getInstance().get2017RankCountByScore(score, isWen))));
+			ranks.add(new RankResult("2016",
+					String.valueOf(DataSource.getInstance().get2016RankCountByScore(score, isWen))));
 			collegeResult.setRanks(ranks);
 		}
 

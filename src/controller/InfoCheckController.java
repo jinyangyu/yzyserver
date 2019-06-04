@@ -13,6 +13,7 @@ import bean.requestresult.InfoUserResult;
 import bean.requestresult.Result;
 import constant.ResultCode;
 import datasource.DataSource;
+import datasource.YouHuiDataSource;
 
 public class InfoCheckController extends Controller {
 	public static Logger logger1 = Logger.getLogger(InfoCheckController.class);
@@ -22,17 +23,19 @@ public class InfoCheckController extends Controller {
 
 		logger1.info("InfoCheckController check");
 
-//		String clientSession = getPara("clientSession");
-//
-//		logger1.info("clientSession:" + clientSession);
-//
-//		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where clientSession = ?",
-//				clientSession);
-//		if (users == null || users.isEmpty()) {
-//			logger1.info("登陆信息失效,clientSession没查到");
-//			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
-//			return;
-//		}
+		String clientSession = getPara("clientSession");
+
+		logger1.info("clientSession:" + clientSession);
+
+		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where clientSession = ?",
+				clientSession);
+		if (users == null || users.isEmpty()) {
+			logger1.info("登陆信息失效,clientSession没查到");
+			renderJson(new Result(ResultCode.LOGIN_ERROR, "登陆信息失效", null));
+			return;
+		}
+
+		UserInfoModel currentUser = users.get(0);
 
 		// if (DataSource.getInstance().shouldUserNotify(currentUser.getOpenid())) {
 		Info info = DataSource.getInstance().getInfoUser();
@@ -42,6 +45,9 @@ public class InfoCheckController extends Controller {
 			String button_text = info.getButton_text();
 			int hasphone = info.getHasphone();
 			String phone_num = info.getPhone_num();
+			String page1_config = info.getPage1_config();
+			String page2_config = info.getPage2_config();
+			String shareTip = info.getShareTip();
 
 			if (hasphone == 1) {
 				String[] phones = phone_num.split(";");
@@ -57,9 +63,12 @@ public class InfoCheckController extends Controller {
 				}
 			}
 
+			int shareCount = YouHuiDataSource.getShareCount(currentUser.getOpenid());
+
 			logger1.info("title:" + title + "content:" + content + "button_text:" + button_text + "hasphone:" + hasphone
-					+ "phone_num:" + phone_num);
-			InfoUserResult result = new InfoUserResult(title, content, button_text, hasphone, phone_num);
+					+ "phone_num:" + phone_num + " shareCount:" + shareCount + " shareTip:" + shareTip);
+			InfoUserResult result = new InfoUserResult(title, content, button_text, hasphone, phone_num, page1_config,
+					page2_config, shareCount, shareTip);
 
 			renderJson(new Result(ResultCode.SUCCESS, "notify", result));
 			return;

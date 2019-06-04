@@ -11,6 +11,9 @@ public class Info extends Model<Info> {
 	private String button_text;
 	private int hasphone;
 	private String phone_num;
+	private String page1_config;
+	private String page2_config;
+	private String shareTip;
 
 	private static final String id_NAME = "id";
 	private static final String title_NAME = "title";
@@ -18,6 +21,9 @@ public class Info extends Model<Info> {
 	private static final String button_text_NAME = "button_text";
 	private static final String hasphone_NAME = "hasphone";
 	private static final String phone_num_NAME = "phone_num";
+	private static final String page1_config_NAME = "page1_config";
+	private static final String page2_config_NAME = "page2_config";
+	private static final String shareTip_NAME = "sharetip";
 
 	public String getId() {
 		return getStr(id_NAME);
@@ -69,5 +75,29 @@ public class Info extends Model<Info> {
 	public void setPhone_num(String phone_num) {
 		set(phone_num_NAME, phone_num);
 	}
-	
+
+	public String getPage1_config() {
+		return getStr(page1_config_NAME);
+	}
+
+	public void setPage1_config(String page1_config) {
+		set(page1_config_NAME, page1_config);
+	}
+
+	public String getPage2_config() {
+		return getStr(page2_config_NAME);
+	}
+
+	public void setPage2_config(String page2_config) {
+		set(page2_config_NAME, page2_config);
+	}
+
+	public String getShareTip() {
+		return getStr(shareTip_NAME);
+	}
+
+	public void setShareTip(String shareTip) {
+		set(shareTip_NAME, shareTip);
+	}
+
 }

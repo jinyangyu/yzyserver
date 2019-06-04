@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 
-import bean.dbmodel.CollegeModel;
 import bean.requestresult.CollegeChanceResult;
 
 public class SortAndFilter {
@@ -36,8 +36,8 @@ public class SortAndFilter {
 		compMap.put("admitLine_wen", new Comparator<CollegeChanceResult>() {
 
 			public int compare(CollegeChanceResult o1, CollegeChanceResult o2) {
-				int wen1 = Integer.parseInt(o1.getCollege().getWen_2017());
-				int wen2 = Integer.parseInt(o2.getCollege().getWen_2017());
+				int wen1 = Integer.parseInt(o1.getCollege().getWen_2018());
+				int wen2 = Integer.parseInt(o2.getCollege().getWen_2018());
 				return wen1 - wen2;
 			}
 		});
@@ -45,8 +45,8 @@ public class SortAndFilter {
 		compMap.put("admitLine_li", new Comparator<CollegeChanceResult>() {
 
 			public int compare(CollegeChanceResult o1, CollegeChanceResult o2) {
-				int li1 = Integer.parseInt(o1.getCollege().getLi_2017());
-				int li2 = Integer.parseInt(o2.getCollege().getLi_2017());
+				int li1 = Integer.parseInt(o1.getCollege().getLi_2018());
+				int li2 = Integer.parseInt(o2.getCollege().getLi_2018());
 				return li1 - li2;
 			}
 		});

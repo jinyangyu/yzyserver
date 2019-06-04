@@ -29,7 +29,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.ElementList;
 import com.jfinal.core.Controller;
 
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
 import bean.requestresult.CollegeChanceResult;
 import datasource.ChanceUtil;
 import datasource.DataSource;
@@ -42,14 +42,14 @@ public class PDFUtil extends Controller {
 	private static final String PDF_PATH = "/root/apache-tomcat-7.0.85/webapps/resources_yzy/user_pdf_dir/";
 	private static final String ICON_PATH = "/root/apache-tomcat-7.0.85/webapps/resources_yzy/icon/";
 
-	private List<CollegeModel> colleges;
+	private List<CollegeModelAll> colleges;
 	private int score;
 	private boolean isWen;
 	private String userName;
 
 	private String pdfName;
 
-	public PDFUtil(List<CollegeModel> colleges, int score, boolean isWen, String userName) {
+	public PDFUtil(List<CollegeModelAll> colleges, int score, boolean isWen, String userName) {
 		this.colleges = colleges;
 		this.score = score;
 		this.isWen = isWen;
@@ -130,7 +130,7 @@ public class PDFUtil extends Controller {
 
 		ChanceUtil chanceUtil = new ChanceUtil();
 		int recommendScore = DataSource.getInstance().getRecommendScore(score, isWen);
-		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges, isWen, recommendScore);
+		List<CollegeChanceResult> chanceCollegeList = chanceUtil.getChanceList(colleges, isWen, recommendScore, 0);
 
 		// 对含概率的院校列表进行排序+筛选
 		SortAndFilter sortAndFilter = new SortAndFilter(chanceCollegeList, "probability", null, null, isWen);
@@ -325,7 +325,7 @@ public class PDFUtil extends Controller {
 
 	private static final int COLLEGE_CELL_HEIGHT = 80;
 
-	private PdfPCell getCollegeCell(CollegeModel college, int chance, boolean isWen) throws IOException {
+	private PdfPCell getCollegeCell(CollegeModelAll college, int chance, boolean isWen) throws IOException {
 		PdfPTable descTable = new PdfPTable(3);
 		descTable.setWidthPercentage(100.0f);
 

@@ -4,34 +4,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
 
 public class LiRecommend implements IRecommendSource {
 
-	private List<CollegeModel> allColleges_li_2017;
-	private HashMap<String, List<CollegeModel>> recommendCache;
+	private List<CollegeModelAll> allColleges_li_2018;
+	private HashMap<String, List<CollegeModelAll>> recommendCache;
 
 	public LiRecommend() {
-		allColleges_li_2017 = new ArrayList<CollegeModel>();
-		recommendCache = new HashMap<String, List<CollegeModel>>();
+		allColleges_li_2018 = new ArrayList<CollegeModelAll>();
+		recommendCache = new HashMap<String, List<CollegeModelAll>>();
 	}
 
-	public void setCollege(List<CollegeModel> colleges) {
-		allColleges_li_2017.addAll(colleges);
-
-		// for (int i = 0; i < allColleges_li_2017.size(); i++) {
-		// System.out.println(
-		// allColleges_li_2017.get(i).getName() + " li_2017:" +
-		// allColleges_li_2017.get(i).getLi_2017());
-		// }
+	public void setCollege(List<CollegeModelAll> colleges) {
+		allColleges_li_2018.addAll(colleges);
 	}
 
-	public List<CollegeModel> recommendCollege(int score) {
+	public List<CollegeModelAll> recommendCollege(int score) {
 		if (recommendCache.containsKey(String.valueOf(score))) {
 			return recommendCache.get(String.valueOf(score));
 		}
 
-		List<CollegeModel> results = RecommendUtil.getInstance().recommendCollege(allColleges_li_2017, score, false);
+		List<CollegeModelAll> results = RecommendUtil.getInstance().recommendCollege(allColleges_li_2018, score, false);
 		if (results != null) {
 			recommendCache.put(String.valueOf(score), results);
 		}

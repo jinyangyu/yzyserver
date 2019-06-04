@@ -2,7 +2,9 @@ package demo;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,14 +18,17 @@ import org.apache.log4j.Logger;
 import com.alibaba.fastjson.JSON;
 import com.aliyuncs.exceptions.ClientException;
 import com.jfinal.core.Controller;
-import com.jfinal.kit.HttpKit;
 
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
+import bean.dbmodel.QrCodeModel;
+import bean.dbmodel.UserInfoModel;
+import bean.dbmodel.WxPayOrderModel;
 import bean.requestresult.Result;
-import constant.Configure;
 import constant.ResultCode;
 import controller.CollegeRecommendController;
 import datasource.DataSource;
+import datasource.RecommendSource;
+import util.LianKaoDataBuilder;
 import util.sms.SmsUtil;
 
 public class HelloController extends Controller {
@@ -51,16 +56,18 @@ public class HelloController extends Controller {
 		// HttpKit.get("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="
 		// + Configure.getAppID()
 		// + "&secret=" + Configure.getSecret());
+		//
+		// System.out.println("result:" + result);
 
 		/*
-		 * { "data":
-		 * "{\"access_token\":\"9_3ef7d4Kqv1To5ZtZi3wo79kFOhGalh-pm-4FHEXsWzkYLSoLIiN622A_P1Hq4fp-kplXeY1Tsv36SJ5cbX_4H9PaZgCCK3g7vwASCNe52gH5_VN5HG505ddh6f3MmAAckenQnMhamR7q12HbOSKbAEADHZ\",\"expires_in\":7200}",
-		 * "result_code": 200, "result_msg": "query success" }
+		 * result:{ "access_token":
+		 * "21_rlWyR65KJgx2ql_pzCJ9A4MlnXjy1Pa-VcZQw5KFXvqJvJ58juXi1XcV8ybiZ1JbhFHYW_LSh5fY1kyeC2_GEppaSjYefTIBP_kYzJMJXs5od7xfSNxtDtfAnRllTTrSGoiIq_Cr0T9asIe5NCUcACAHWO",
+		 * "expires_in":7200}
 		 */
 
-		String token = "10_sSKuvsW1HizYR7_wy4PeZDdgwVFmKvJYYsamUatfcFjl9p3zxHyJeDL_-qTvqcgJD8PSrc4gQFyXPyEwpNtp4Sir0fkfC6pamekEJTgrAm_z92MT_iTynGLilqvpHWdTdLXf8haddn3crRh_GQWjAJAUEK";
+		String token = "21_rlWyR65KJgx2ql_pzCJ9A4MlnXjy1Pa-VcZQw5KFXvqJvJ58juXi1XcV8ybiZ1JbhFHYW_LSh5fY1kyeC2_GEppaSjYefTIBP_kYzJMJXs5od7xfSNxtDtfAnRllTTrSGoiIq_Cr0T9asIe5NCUcACAHWO";
 
-		for (int i = 2000; i < 3000; i++) {
+		for (int i = 6001; i < 6999; i++) {
 			createQrCode(token, i);
 		}
 
@@ -70,7 +77,7 @@ public class HelloController extends Controller {
 	private void createQrCode(String token, int number) {
 		HashMap<String, Object> queryParas = new HashMap<String, Object>();
 		queryParas.put("scene", "tuiguang_" + number);
-		queryParas.put("page", "pages/index/index");
+		queryParas.put("page", "pages/expert/expert");
 		queryParas.put("width", "430");
 		queryParas.put("auto_color", true);
 
@@ -99,7 +106,7 @@ public class HelloController extends Controller {
 			// File codeFile = new
 			// File("/root/apache-tomcat-7.0.85/webapps/yzyserver/yujinyang_code.png");
 
-			String qrFileName = "/Users/yujinyang11/Desktop/app_code_2000_3000/豫志愿推广二维码_" + number + ".png";
+			String qrFileName = "/Users/yujinyang11/Desktop/app_code_6001_6999/豫志愿推广二维码_" + number + ".png";
 
 			File codeFile = new File(qrFileName);
 
@@ -127,12 +134,13 @@ public class HelloController extends Controller {
 	}
 
 	public void setRank() {
-		List<CollegeModel> allCollege = DataSource.getInstance().getAllColleges();
+		List<CollegeModelAll> allCollege = DataSource.getInstance().getAllColleges();
 
-		for (CollegeModel model : allCollege) {
+		for (CollegeModelAll model : allCollege) {
 			int li_2015 = 0;
 			int li_2016 = 0;
 			int li_2017 = 0;
+			int li_2018 = 0;
 
 			if (model.getLi_2015() != null && !"".equals(model.getLi_2015())) {
 				try {
@@ -152,14 +160,22 @@ public class HelloController extends Controller {
 				} catch (Exception e) {
 				}
 			}
+			if (model.getLi_2018() != null && !"".equals(model.getLi_2018())) {
+				try {
+					li_2018 = Integer.parseInt(model.getLi_2018());
+				} catch (Exception e) {
+				}
+			}
 
 			model.setLi_2015_rank(DataSource.getInstance().get2015RankByScore(li_2015, false));
 			model.setLi_2016_rank(DataSource.getInstance().get2016RankByScore(li_2016, false));
 			model.setLi_2017_rank(DataSource.getInstance().get2017RankByScore(li_2017, false));
+			model.setLi_2018_rank(DataSource.getInstance().get2018RankByScore(li_2018, false));
 
 			int wen_2015 = 0;
 			int wen_2016 = 0;
 			int wen_2017 = 0;
+			int wen_2018 = 0;
 
 			if (model.getWen_2015() != null && !"".equals(model.getWen_2015())) {
 				try {
@@ -179,24 +195,33 @@ public class HelloController extends Controller {
 				} catch (Exception e) {
 				}
 			}
+			if (model.getWen_2018() != null && !"".equals(model.getWen_2018())) {
+				try {
+					wen_2018 = Integer.parseInt(model.getWen_2018());
+				} catch (Exception e) {
+				}
+			}
 
-			model.setWen_2015_rank(DataSource.getInstance().get2015RankByScore(wen_2015, true));
-			model.setWen_2016_rank(DataSource.getInstance().get2016RankByScore(wen_2016, true));
-			model.setWen_2017_rank(DataSource.getInstance().get2017RankByScore(wen_2017, true));
+			model.setWen_2015_rank(DataSource.getInstance().get2015RankCountByScore(wen_2015, true));
+			model.setWen_2016_rank(DataSource.getInstance().get2016RankCountByScore(wen_2016, true));
+			model.setWen_2017_rank(DataSource.getInstance().get2017RankCountByScore(wen_2017, true));
+			model.setWen_2018_rank(DataSource.getInstance().get2018RankCountByScore(wen_2018, true));
 
 			model.update();
 		}
+
+		renderJson(new Result(ResultCode.SUCCESS, "更新成功", null));
 	}
 
 	public void clearRecommendCache() {
 		renderHtml(DataSource.getInstance().clearRecommendCache());
 	}
-	
+
 	public void resetShouldUserNotify() {
 		DataSource.getInstance().resetNotifyedUser();
 		renderJson(new Result(200, "重置成功", null));
 	}
-	
+
 	public void resetInfo() {
 		DataSource.getInstance().resetInfoUser();
 		renderJson(new Result(200, "重置成功", DataSource.getInstance().getInfoUser()));
@@ -212,6 +237,122 @@ public class HelloController extends Controller {
 			return;
 		}
 		renderJson(new Result(ResultCode.SUCCESS, "短信发送成功", null));
+	}
+
+	public void parseQrcode() {
+		HashMap<String, String> userMap = new HashMap<String, String>();
+
+		List<UserInfoModel> userList = UserInfoModel.dao.find("select * from userinfo");
+		for (UserInfoModel user : userList) {
+			userMap.put(user.getNickName(), user.getOpenid());
+		}
+
+		List<QrCodeModel> qrcodeList = QrCodeModel.dao.find("select * from qrcode");
+		HashMap<String, QrCodeModel> qrcodeMap = new HashMap<String, QrCodeModel>();
+		for (QrCodeModel qrcode : qrcodeList) {
+			qrcodeMap.put(qrcode.getOpenid(), null);
+		}
+
+		int need = 0;
+		int notNeed = 0;
+		int total = 0;
+		int dbTotal = qrcodeList.size();
+
+		LogParser parser = new LogParser();
+		try {
+			List<UserQr> userQrList = parser.getUserQrcode();
+			total = userQrList.size();
+			for (UserQr userQr : userQrList) {
+				if (userMap.containsKey(userQr.nickName)) {
+					if (qrcodeMap.containsKey(userMap.get(userQr.nickName))) {
+						notNeed++;
+					} else {
+						need++;
+						// QrCodeModel qrCodeModel = new QrCodeModel();
+						// qrCodeModel.setOpenid(userMap.get(userQr.nickName));
+						// qrCodeModel.setQrcode(userQr.qrcode);
+						// qrCodeModel.save();
+					}
+				} else {
+					System.out.println(userQr.nickName + " 不存在 !!!!!!!!!!");
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		renderJson(new Result(ResultCode.SUCCESS,
+				"数据库共:" + dbTotal + " 待确认共:" + total + "； " + notNeed + " 已存在推荐人；" + need + " 需要写入", null));
+	}
+
+	public void qrcodeCount() {
+		List<QrCodeModel> qrcodeList = QrCodeModel.dao.find("select * from qrcode");
+		List<WxPayOrderModel> ordersList = WxPayOrderModel.dao
+				.find("select * from orders_wxpay where total_fee in (3900,4900) and status='PAY_SUCCESS'");
+
+		HashMap<String, WxPayOrderModel> orderMap = new HashMap<String, WxPayOrderModel>();
+		for (WxPayOrderModel order : ordersList) {
+			orderMap.put(order.getOpenid(), order);
+		}
+
+		HashMap<String, List<String>> qrMap = new HashMap<String, List<String>>();
+		for (QrCodeModel qrcode : qrcodeList) {
+			if (qrMap.containsKey(qrcode.getQrcode())) {
+				List<String> ids = qrMap.get(qrcode.getQrcode());
+				if (ids.contains(qrcode.getOpenid())) {
+					System.out.println("推荐人写入重复！！！！！");
+				} else {
+					ids.add(qrcode.getOpenid());
+				}
+			} else {
+				List<String> ids = new ArrayList<String>();
+				ids.add(qrcode.getOpenid());
+				qrMap.put(qrcode.getQrcode(), ids);
+			}
+		}
+
+		String line = "";
+		for (String code : qrMap.keySet()) {
+			List<String> openidList = qrMap.get(code);
+			line = code + "\t" + openidList.size() + "\t";
+
+			int payCount1 = 0;
+			int payCount2 = 0;
+			int payCount3 = 0;
+			for (String openid : openidList) {
+				if (orderMap.containsKey(openid)) {
+					WxPayOrderModel order = orderMap.get(openid);
+					if (order.getTotal_fee() == 3900) {
+						payCount1++;
+					} else if (order.getTotal_fee() == 4900) {
+						payCount2++;
+					} else {
+						payCount3++;
+					}
+				}
+			}
+			line += payCount1;
+			line += "\t";
+
+			line += payCount2;
+			line += "\t";
+
+			line += payCount3;
+			line += "\t";
+			System.out.println(line);
+		}
+
+		renderJson(new Result(ResultCode.SUCCESS, "", null));
+	}
+
+	public void initLiankaoData() {
+		LianKaoDataBuilder.getInstance().init();
+		renderJson(new Result(ResultCode.SUCCESS, "", null));
+	}
+
+	public void newRecommend() {
+		RecommendSource.getInstance().init();
+		renderJson(new Result(ResultCode.SUCCESS, "init", null));
 	}
 
 }

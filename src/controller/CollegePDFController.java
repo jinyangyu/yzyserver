@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.jfinal.core.Controller;
 
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
 import bean.dbmodel.UserInfoModel;
 import bean.dbmodel.YzyOrderModel;
 import bean.requestresult.PdfResult;
@@ -85,7 +85,7 @@ public class CollegePDFController extends Controller {
 
 	private String create(YzyOrderModel order, String subject, int score, String userName) {
 		boolean isWen = "wenke".equals(subject);
-		List<CollegeModel> colleges = DataSource.getInstance().recommendCollege(score, isWen);
+		List<CollegeModelAll> colleges = DataSource.getInstance().recommendCollege(score, isWen);
 		PDFUtil pdfUtil = new PDFUtil(colleges, score, isWen, userName);
 		String pdfName = pdfUtil.createPDF();
 

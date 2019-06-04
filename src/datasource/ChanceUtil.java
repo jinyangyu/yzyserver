@@ -3,19 +3,22 @@ package datasource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 import org.apache.log4j.Logger;
+
 import bean.dbmodel.ChanceCacheModel;
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
 import bean.requestresult.CollegeChanceResult;
 
 public class ChanceUtil {
 	public static Logger logger1 = Logger.getLogger(ChanceUtil.class);
 	private static Random random = new Random(System.currentTimeMillis());
 
-	public List<CollegeChanceResult> getChanceList(List<CollegeModel> colleges_all, boolean isWen, int score) {
+	public List<CollegeChanceResult> getChanceList(List<CollegeModelAll> colleges_all, boolean isWen, int score,
+			int liankao_id) {
 		List<CollegeChanceResult> chanceResultList = new ArrayList<CollegeChanceResult>();
 
-		String key = score + "_" + isWen;
+		String key = score + "_" + isWen + "_" + liankao_id;
 		ChanceCacheModel chanceCache = ChanceCacheModel.dao.findFirst("select * from chance_cache where cacheKey = ?",
 				key);
 
@@ -29,11 +32,12 @@ public class ChanceUtil {
 
 				int diff = 0;
 				if (isWen) {
-					diff = score - Integer.parseInt(chanceResult.getCollege().getWen_2017());
-					
-					System.out.println("diff " + chanceResult.getCollege().getName() + "--" + chanceResult.getCollege().getWen_2017());
+					diff = score - Integer.parseInt(chanceResult.getCollege().getWen_2018());
+
+					System.out.println("diff " + chanceResult.getCollege().getName() + "--"
+							+ chanceResult.getCollege().getWen_2018());
 				} else {
-					diff = score - Integer.parseInt(chanceResult.getCollege().getLi_2017());
+					diff = score - Integer.parseInt(chanceResult.getCollege().getLi_2018());
 				}
 
 				// 0-5 30%-40%
@@ -105,7 +109,8 @@ public class ChanceUtil {
 	}
 
 	private void removeKey(String key) {
-		ChanceCacheModel chanceCache = ChanceCacheModel.dao.findFirst("select * from chance_cache where key = ?", key);
+		ChanceCacheModel chanceCache = ChanceCacheModel.dao.findFirst("select * from chance_cache where cacheKey = ?",
+				key);
 		if (chanceCache != null) {
 			chanceCache.delete();
 		}

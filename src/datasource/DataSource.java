@@ -1,15 +1,15 @@
 package datasource;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import bean.dbmodel.AdminOpenid;
-import bean.dbmodel.CollegeModel;
+import bean.dbmodel.CollegeModelAll;
 import bean.dbmodel.Info;
 import bean.dbmodel.InfoUserCheck;
 import bean.dbmodel.ScoreRankModel;
@@ -19,7 +19,9 @@ public class DataSource {
 	public static Logger logger1 = Logger.getLogger(CollegeRecommendController.class);
 
 	private static DataSource dataSource = new DataSource();
-	private List<CollegeModel> allColleges;
+	private List<CollegeModelAll> allColleges;
+	private List<CollegeModelAll> henanColleges_wen;
+	private List<CollegeModelAll> henanColleges_li;
 
 	private List<ScoreRankModel> li_2018_ScoreRanks;
 	private List<ScoreRankModel> wen_2018_ScoreRanks;
@@ -44,12 +46,13 @@ public class DataSource {
 	private DataSource() {
 		logger1.info("DataSource init");
 		long start = System.currentTimeMillis();
-		allColleges = CollegeModel.dao.find(
+		allColleges = CollegeModelAll.dao.find(
 				"select " + "id,name, area,characteristic,type,build_time,import_subject_count,doctoral_program_count,"
 						+ "master_program_count,belong,academician_count,student_count,telephone,"
-						+ "address,official_website,enrolment_website,logo," + "wen_2017,wen_2016,wen_2015,"
-						+ "li_2017,li_2016,li_2015,province,college_id," + "li_2017_rank,li_2016_rank,li_2015_rank,"
-						+ "wen_2017_rank,wen_2016_rank,wen_2015_rank " + "from college");
+						+ "address,official_website,enrolment_website,logo," + "wen_2018,wen_2017,wen_2016,wen_2015,"
+						+ "li_2018,li_2017,li_2016,li_2015,province,college_id,"
+						+ "li_2018_rank,li_2017_rank,li_2016_rank,li_2015_rank,"
+						+ "wen_2018_rank,wen_2017_rank,wen_2016_rank,wen_2015_rank " + "from college_all");
 
 		logger1.info("DataSource init colleges use:" + (System.currentTimeMillis() - start) + " ms");
 
@@ -86,9 +89,28 @@ public class DataSource {
 
 		logger1.info("DataSource init colleges sort by li_2017 use:" + (System.currentTimeMillis() - start) + " ms");
 
+		initHenanCollege();
+
 		resetAdmin();
 		resetInfoUser();
 		resetNotifyedUser();
+	}
+
+	private void initHenanCollege() {
+		henanColleges_wen = new ArrayList<CollegeModelAll>();
+		henanColleges_li = new ArrayList<CollegeModelAll>();
+		for (CollegeModelAll model : allColleges) {
+			if ("河南".equals(model.getProvince())) {
+				henanColleges_wen.add(model);
+				henanColleges_li.add(model);
+			}
+		}
+		Collections.sort(henanColleges_li, liComp);
+		Collections.sort(henanColleges_wen, wenComp);
+	}
+
+	public List<CollegeModelAll> getHenanCollege(boolean isWen) {
+		return isWen ? henanColleges_wen : henanColleges_li;
 	}
 
 	public void resetNotifyedUser() {
@@ -146,15 +168,19 @@ public class DataSource {
 		return dataSource;
 	}
 
-	public List<CollegeModel> getAllColleges() {
+	public List<CollegeModelAll> getAllColleges() {
 		return allColleges;
 	}
 
-	public List<CollegeModel> recommendCollege(int score, boolean isWen) {
+	public List<CollegeModelAll> recommendCollege(int score, boolean isWen) {
 		// 得到2017年对应排名的分数，以此查询提档线数据，给出推荐院校
 		int recommendScore = getRecommendScore(score, isWen);
 		logger1.info("recommendCollege recommendScore:" + recommendScore);
 
+		return recommendCollegeByScore(recommendScore, isWen);
+	}
+
+	public List<CollegeModelAll> recommendCollegeByScore(int recommendScore, boolean isWen) {
 		if (isWen) {
 			return recommendSource_wen.recommendCollege(recommendScore);
 		}
@@ -175,7 +201,7 @@ public class DataSource {
 		for (ScoreRankModel scoreRank : scores) {
 			// logger1.info("recommendCollege scoreRank:" + scoreRank.getRank() + " rank:" +
 			// rank);
-			if (scoreRank.getCount() >= rank) {
+			if (scoreRank.getRank() >= rank) {
 				// logger1.info("recommendCollege rank To score:" + scoreRank.getScore());
 				return scoreRank.getScore();
 			}
@@ -193,7 +219,26 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getCount();
+				return rank.getRank();
+			}
+		}
+		return -1;
+	}
+
+	/*
+	 * 通过当年分数，查询当年排名
+	 */
+	public int get2018RankCountByScore(int score, boolean isWen) {
+
+		List<ScoreRankModel> scores;
+		scores = isWen ? wen_2018_ScoreRanks : li_2018_ScoreRanks;
+
+		int rankCount = 0;
+		for (ScoreRankModel rank : scores) {
+			if (rank.getScore() <= score) {
+				return rankCount;
+			} else {
+				rankCount += rank.getCount();
 			}
 		}
 		return -1;
@@ -209,7 +254,26 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getCount();
+				return rank.getRank();
+			}
+		}
+		return -1;
+	}
+
+	/*
+	 * 通过当年分数，查询当年排名
+	 */
+	public int get2017RankCountByScore(int score, boolean isWen) {
+
+		List<ScoreRankModel> scores;
+		scores = isWen ? wen_2017_ScoreRanks : li_2017_ScoreRanks;
+
+		int rankCount = 0;
+		for (ScoreRankModel rank : scores) {
+			if (rank.getScore() <= score) {
+				return rankCount;
+			} else {
+				rankCount += rank.getCount();
 			}
 		}
 		return -1;
@@ -225,7 +289,26 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getCount();
+				return rank.getRank();
+			}
+		}
+		return -1;
+	}
+
+	/*
+	 * 通过当年分数，查询当年排名
+	 */
+	public int get2016RankCountByScore(int score, boolean isWen) {
+
+		List<ScoreRankModel> scores;
+		scores = isWen ? wen_2016_ScoreRanks : li_2016_ScoreRanks;
+
+		int rankCount = 0;
+		for (ScoreRankModel rank : scores) {
+			if (rank.getScore() <= score) {
+				return rankCount;
+			} else {
+				rankCount += rank.getCount();
 			}
 		}
 		return -1;
@@ -241,43 +324,72 @@ public class DataSource {
 
 		for (ScoreRankModel rank : scores) {
 			if (rank.getScore() <= score) {
-				return rank.getCount();
+				return rank.getRank();
 			}
 		}
 		return -1;
 	}
 
-	private Comparator liComp = new Comparator<CollegeModel>() {
-		public int compare(CollegeModel arg0, CollegeModel arg1) {
-			int li_2017_0 = 0;
-			int li_2017_1 = 0;
+	/*
+	 * 通过当年分数，查询当年排名
+	 */
+	public int get2015RankCountByScore(int score, boolean isWen) {
+
+		List<ScoreRankModel> scores;
+		scores = isWen ? wen_2015_ScoreRanks : li_2015_ScoreRanks;
+
+		int rankCount = 0;
+		for (ScoreRankModel rank : scores) {
+			if (rank.getScore() <= score) {
+				return rankCount;
+			} else {
+				rankCount += rank.getCount();
+			}
+		}
+		return -1;
+	}
+
+	public int get2018ScoreByRank(int rank, boolean isWen) {
+		List<ScoreRankModel> scoreRanks = isWen ? wen_2018_ScoreRanks : li_2018_ScoreRanks;
+		for (ScoreRankModel model : scoreRanks) {
+			if (model.getRank() >= rank) {
+				return model.getScore();
+			}
+		}
+		return 0;
+	}
+
+	private Comparator liComp = new Comparator<CollegeModelAll>() {
+		public int compare(CollegeModelAll arg0, CollegeModelAll arg1) {
+			int li_2018_0 = 0;
+			int li_2018_1 = 0;
 			try {
-				li_2017_0 = Integer.parseInt(arg0.getLi_2017());
+				li_2018_0 = Integer.parseInt(arg0.getLi_2018());
 			} catch (Exception e) {
 			}
 
 			try {
-				li_2017_1 = Integer.parseInt(arg1.getLi_2017());
+				li_2018_1 = Integer.parseInt(arg1.getLi_2018());
 			} catch (Exception e) {
 			}
-			return li_2017_1 - li_2017_0;
+			return li_2018_1 - li_2018_0;
 		}
 	};
 
-	private Comparator wenComp = new Comparator<CollegeModel>() {
-		public int compare(CollegeModel arg0, CollegeModel arg1) {
-			int wen_2017_0 = 0;
-			int wen_2017_1 = 0;
+	private Comparator wenComp = new Comparator<CollegeModelAll>() {
+		public int compare(CollegeModelAll arg0, CollegeModelAll arg1) {
+			int wen_2018_0 = 0;
+			int wen_2018_1 = 0;
 			try {
-				wen_2017_0 = Integer.parseInt(arg0.getWen_2017());
+				wen_2018_0 = Integer.parseInt(arg0.getWen_2018());
 			} catch (Exception e) {
 			}
 
 			try {
-				wen_2017_1 = Integer.parseInt(arg1.getWen_2017());
+				wen_2018_1 = Integer.parseInt(arg1.getWen_2018());
 			} catch (Exception e) {
 			}
-			return wen_2017_1 - wen_2017_0;
+			return wen_2018_1 - wen_2018_0;
 		}
 	};
 

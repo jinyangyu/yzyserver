@@ -28,36 +28,49 @@ public class QRCodeBindController extends Controller {
 			return;
 		}
 
-		String qrCode = getPara("scene");
-		if (qrCode == null || "".equals(qrCode)) {
-			qrCode = "0000";
-		}
-
 		UserInfoModel user = users.get(0);
 		String openId = user.getOpenid();
-		
-		if(openId == null || "".equals(openId)) {
-			
+
+		if (openId == null || "".equals(openId)) {
 			logger1.error("用户 " + user.getNickName() + " openId 是空，数据异常!!!");
-			
 			renderJson(new Result(ResultCode.SUCCESS, "qrcode bind failed openId is Null", null));
 			return;
 		}
-		
-		List<QrCodeModel> bindList  = QrCodeModel.dao.find("select * from qrcode where openid = ?", openId);
-		
-		if(bindList == null || bindList.size() == 0) {
+
+		String qrCode = getPara("scene");
+		if (qrCode == null || "".equals(qrCode)) {
+			qrCode = "";
+		}
+
+		String shareFromOpenId = getPara("share_from");
+		if (shareFromOpenId == null || "".equals(shareFromOpenId)) {
+			shareFromOpenId = "";
+		}
+
+		logger1.info("QRCodeBindController bind openId:" + openId + " qrCode:" + qrCode + " shareFromOpenId:"
+				+ shareFromOpenId);
+
+		if ("".equals(qrCode) && "".equals(shareFromOpenId)) {
+			logger1.error("用户 " + user.getNickName() + " 二维码，分享码都是空，不处理!!!");
+			renderJson(new Result(ResultCode.SUCCESS, "", ""));
+			return;
+		}
+
+		List<QrCodeModel> bindList = QrCodeModel.dao.find("select * from qrcode where openid = ?", openId);
+
+		if (bindList == null || bindList.size() == 0) {
 			QrCodeModel bind = new QrCodeModel();
 			bind.setOpenid(openId);
 			bind.setQrcode(qrCode);
+			bind.setSharefrom(shareFromOpenId);
 			bind.setTime(String.valueOf(System.currentTimeMillis()));
 			bind.save();
-			
+
 			renderJson(new Result(ResultCode.SUCCESS, "qrcode bind success", ""));
-		}else {
+		} else {
 			QrCodeModel bind = bindList.get(0);
-			String errorString = "用户 " + user.getNickName() + " openId:" + openId + " 已绑定推广人："
-					+ bind.getQrcode();
+			String errorString = "用户 " + user.getNickName() + " openId:" + openId + " 已绑定推广人：" + bind.getQrcode()
+					+ " 分享人:" + bind.getSharefrom();
 			logger1.error(errorString);
 			renderJson(new Result(ResultCode.SUCCESS, "qrcode bind failed:" + errorString, null));
 		}

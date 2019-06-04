@@ -2,8 +2,8 @@ package bean.dbmodel;
 
 import com.jfinal.plugin.activerecord.Model;
 
-public class CollegeModel extends Model<CollegeModel> {
-	public static final CollegeModel dao = new CollegeModel().dao();
+public class CollegeModelAll extends Model<CollegeModelAll> {
+	public static final CollegeModelAll dao = new CollegeModelAll().dao();
 
 	private int id;
 	private String name;
@@ -24,30 +24,20 @@ public class CollegeModel extends Model<CollegeModel> {
 	private String logo;
 	private String province;
 	private String college_id;
-	// private String survey;
-	// private String national_key_discipline;
-	// private String characteristic_specialty;
-	// private String state_key_laboratories;
-	// private String first_class_subject;
-	// private String campus_scenery;
 	private String wen_2018;
 	private String wen_2017;
 	private String wen_2016;
 	private String wen_2015;
-	// private String wen_2014;
-	// private String wen_2013;
 	private String li_2018;
 	private String li_2017;
 	private String li_2016;
 	private String li_2015;
-	// private String li_2014;
-	// private String li_2013;
-	
+
 	private int wen_2018_rank;
 	private int wen_2017_rank;
 	private int wen_2016_rank;
 	private int wen_2015_rank;
-	
+
 	private int li_2018_rank;
 	private int li_2017_rank;
 	private int li_2016_rank;
@@ -56,6 +46,47 @@ public class CollegeModel extends Model<CollegeModel> {
 	// 非数据库字段
 	private boolean is211;
 	private boolean is985;
+
+	public static CollegeModelAll copyFromCollege(CollegeModel college) {
+		CollegeModelAll collegeAll = new CollegeModelAll();
+		collegeAll.setName(college.getName());
+		collegeAll.setArea(college.getArea());
+		collegeAll.setCharacteristic(college.getCharacteristic());
+		collegeAll.setType(college.getType());
+		collegeAll.setBuild_time(college.getBuild_time());
+		collegeAll.setImport_subject_count(college.getImport_subject_count());
+		collegeAll.setDoctoral_program_count(college.getDoctoral_program_count());
+		collegeAll.setMaster_program_count(college.getMaster_program_count());
+		collegeAll.setBelong(college.getBelong());
+		collegeAll.setAcademician_count(college.getAcademician_count());
+		collegeAll.setStudent_count(college.getStudent_count());
+		collegeAll.setTelephone(college.getTelephone());
+		collegeAll.setAddress(college.getAddress());
+		collegeAll.setOfficial_website(college.getOfficial_website());
+		collegeAll.setEnrolment_website(college.getEnrolment_website());
+		collegeAll.setLogo(college.getLogo());
+		collegeAll.setProvince(college.getProvince());
+		collegeAll.setCollege_id(college.getCollege_id());
+		collegeAll.setWen_2018(college.getWen_2018());
+		collegeAll.setWen_2017(college.getWen_2017());
+		collegeAll.setWen_2016(college.getWen_2016());
+		collegeAll.setWen_2015(college.getWen_2015());
+		collegeAll.setLi_2018(college.getLi_2018());
+		collegeAll.setLi_2017(college.getLi_2017());
+		collegeAll.setLi_2016(college.getLi_2016());
+		collegeAll.setLi_2015(college.getLi_2015());
+		collegeAll.setWen_2018_rank(college.getWen_2018_rank());
+		collegeAll.setWen_2017_rank(college.getWen_2017_rank());
+		collegeAll.setWen_2016_rank(college.getWen_2016_rank());
+		collegeAll.setWen_2015_rank(college.getWen_2015_rank());
+		collegeAll.setLi_2018_rank(college.getLi_2018_rank());
+		collegeAll.setLi_2017_rank(college.getLi_2017_rank());
+		collegeAll.setLi_2016_rank(college.getLi_2016_rank());
+		collegeAll.setLi_2015_rank(college.getLi_2015_rank());
+		collegeAll.setIs211(college.isIs211());
+		collegeAll.setIs985(college.isIs985());
+		return collegeAll;
+	}
 
 	private static final String id_NAME = "id";
 	private static final String name_NAME = "name";
@@ -76,29 +107,16 @@ public class CollegeModel extends Model<CollegeModel> {
 	private static final String logo_NAME = "logo";
 	private static final String province_NAME = "province";
 	private static final String college_id_NAME = "college_id";
-	
-	// private static final String survey_NAME = "survey";
-	// private static final String national_key_discipline_NAME =
-	// "national_key_discipline";
-	// private static final String characteristic_specialty_NAME =
-	// "characteristic_specialty";
-	// private static final String state_key_laboratories_NAME =
-	// "state_key_laboratories";
-	// private static final String first_class_subject_NAME = "first_class_subject";
-	// private static final String campus_scenery_NAME = "campus_scenery";
+
 	private static final String wen_2018_NAME = "wen_2018";
 	private static final String wen_2017_NAME = "wen_2017";
 	private static final String wen_2016_NAME = "wen_2016";
 	private static final String wen_2015_NAME = "wen_2015";
-//	private static final String wen_2014_NAME = "wen_2014";
-//	private static final String wen_2013_NAME = "wen_2013";
 	private static final String li_2018_NAME = "li_2018";
 	private static final String li_2017_NAME = "li_2017";
 	private static final String li_2016_NAME = "li_2016";
 	private static final String li_2015_NAME = "li_2015";
-//	private static final String li_2014_NAME = "li_2014";
-//	private static final String li_2013_NAME = "li_2013";
-	
+
 	private static final String wen_2018_rank_NAME = "wen_2018_rank";
 	private static final String wen_2017_rank_NAME = "wen_2017_rank";
 	private static final String wen_2016_rank_NAME = "wen_2016_rank";
@@ -115,7 +133,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	public void setWen_2018_rank(int wen_2018_rank) {
 		set(wen_2018_rank_NAME, wen_2018_rank);
 	}
-	
+
 	public int getWen_2017_rank() {
 		return getInt(wen_2017_rank_NAME);
 	}
@@ -139,7 +157,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	public void setWen_2015_rank(int wen_2015_rank) {
 		set(wen_2015_rank_NAME, wen_2015_rank);
 	}
-	
+
 	public int getLi_2018_rank() {
 		return getInt(li_2018_rank_NAME);
 	}
@@ -185,7 +203,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		set(name_NAME, name);
 	}
 
 	public String getArea() {
@@ -193,7 +211,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setArea(String area) {
-		this.area = area;
+		set(area_NAME, area);
 	}
 
 	public String getCharacteristic() {
@@ -201,7 +219,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setCharacteristic(String characteristic) {
-		this.characteristic = characteristic;
+		set(characteristic_NAME, characteristic);
 	}
 
 	public String getType() {
@@ -209,7 +227,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setType(String type) {
-		this.type = type;
+		set(type_NAME, type);
 	}
 
 	public String getBuild_time() {
@@ -217,7 +235,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setBuild_time(String build_time) {
-		this.build_time = build_time;
+		set(build_time_NAME, build_time);
 	}
 
 	public String getImport_subject_count() {
@@ -225,7 +243,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setImport_subject_count(String import_subject_count) {
-		this.import_subject_count = import_subject_count;
+		set(import_subject_count_NAME, import_subject_count);
 	}
 
 	public String getDoctoral_program_count() {
@@ -233,7 +251,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setDoctoral_program_count(String doctoral_program_count) {
-		this.doctoral_program_count = doctoral_program_count;
+		set(doctoral_program_count_NAME, doctoral_program_count);
 	}
 
 	public String getMaster_program_count() {
@@ -241,7 +259,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setMaster_program_count(String master_program_count) {
-		this.master_program_count = master_program_count;
+		set(master_program_count_NAME, master_program_count);
 	}
 
 	public String getBelong() {
@@ -249,7 +267,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setBelong(String belong) {
-		this.belong = belong;
+		set(belong_NAME, belong);
 	}
 
 	public String getAcademician_count() {
@@ -257,7 +275,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setAcademician_count(String academician_count) {
-		this.academician_count = academician_count;
+		set(academician_count_NAME, academician_count);
 	}
 
 	public String getStudent_count() {
@@ -265,7 +283,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setStudent_count(String student_count) {
-		this.student_count = student_count;
+		set(student_count_NAME, student_count);
 	}
 
 	public String getTelephone() {
@@ -273,7 +291,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setTelephone(String telephone) {
-		this.telephone = telephone;
+		set(telephone_NAME, telephone);
 	}
 
 	public String getAddress() {
@@ -281,7 +299,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setAddress(String address) {
-		this.address = address;
+		set(address_NAME, address);
 	}
 
 	public String getOfficial_website() {
@@ -289,7 +307,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setOfficial_website(String official_website) {
-		this.official_website = official_website;
+		set(official_website_NAME, official_website);
 	}
 
 	public String getEnrolment_website() {
@@ -297,7 +315,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setEnrolment_website(String enrolment_website) {
-		this.enrolment_website = enrolment_website;
+		set(enrolment_website_NAME, enrolment_website);
 	}
 
 	public String getLogo() {
@@ -305,79 +323,31 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setLogo(String logo) {
-		this.logo = logo;
+		set(logo_NAME, logo);
 	}
-	
+
 	public String getProvince() {
 		return getStr(province_NAME);
 	}
 
 	public void setProvince(String province) {
-		this.province = province;
+		set(province_NAME, province);
 	}
-	
+
 	public String getCollege_id() {
 		return getStr(college_id_NAME);
 	}
 
 	public void setCollege_id(String college_id) {
-		this.college_id = college_id;
+		set(college_id_NAME, college_id);
 	}
 
-	// public String getSurvey() {
-	// return getStr(survey_NAME);
-	// }
-	//
-	// public void setSurvey(String survey) {
-	// this.survey = survey;
-	// }
-	//
-	// public String getNational_key_discipline() {
-	// return getStr(national_key_discipline_NAME);
-	// }
-	//
-	// public void setNational_key_discipline(String national_key_discipline) {
-	// this.national_key_discipline = national_key_discipline;
-	// }
-	//
-	// public String getCharacteristic_specialty() {
-	// return getStr(characteristic_specialty_NAME);
-	// }
-	//
-	// public void setCharacteristic_specialty(String characteristic_specialty) {
-	// this.characteristic_specialty = characteristic_specialty;
-	// }
-	//
-	// public String getState_key_laboratories() {
-	// return getStr(state_key_laboratories_NAME);
-	// }
-	//
-	// public void setState_key_laboratories(String state_key_laboratories) {
-	// this.state_key_laboratories = state_key_laboratories;
-	// }
-	//
-	// public String getFirst_class_subject() {
-	// return getStr(first_class_subject_NAME);
-	// }
-	//
-	// public void setFirst_class_subject(String first_class_subject) {
-	// this.first_class_subject = first_class_subject;
-	// }
-	//
-	// public String getCampus_scenery() {
-	// return getStr(campus_scenery_NAME);
-	// }
-	//
-	// public void setCampus_scenery(String campus_scenery) {
-	// this.campus_scenery = campus_scenery;
-	// }
-	
 	public String getWen_2018() {
 		return getStr(wen_2018_NAME);
 	}
 
 	public void setWen_2018(String wen_2018) {
-		this.wen_2018 = wen_2018;
+		set(wen_2018_NAME, wen_2018);
 	}
 
 	public String getWen_2017() {
@@ -385,7 +355,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setWen_2017(String wen_2017) {
-		this.wen_2017 = wen_2017;
+		set(wen_2017_NAME, wen_2017);
 	}
 
 	public String getWen_2016() {
@@ -393,7 +363,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setWen_2016(String wen_2016) {
-		this.wen_2016 = wen_2016;
+		set(wen_2016_NAME, wen_2016);
 	}
 
 	public String getWen_2015() {
@@ -401,31 +371,15 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setWen_2015(String wen_2015) {
-		this.wen_2015 = wen_2015;
+		set(wen_2015_NAME, wen_2015);
 	}
 
-	// public String getWen_2014() {
-	// return getStr(wen_2014_NAME);
-	// }
-	//
-	// public void setWen_2014(String wen_2014) {
-	// this.wen_2014 = wen_2014;
-	// }
-	//
-	// public String getWen_2013() {
-	// return getStr(wen_2013_NAME);
-	// }
-	//
-	// public void setWen_2013(String wen_2013) {
-	// this.wen_2013 = wen_2013;
-	// }
-	
 	public String getLi_2018() {
 		return getStr(li_2018_NAME);
 	}
 
 	public void setLi_2018(String li_2018) {
-		this.li_2018 = li_2018;
+		set(li_2018_NAME, li_2018);
 	}
 
 	public String getLi_2017() {
@@ -433,7 +387,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setLi_2017(String li_2017) {
-		this.li_2017 = li_2017;
+		set(li_2017_NAME, li_2017);
 	}
 
 	public String getLi_2016() {
@@ -441,7 +395,7 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setLi_2016(String li_2016) {
-		this.li_2016 = li_2016;
+		set(li_2016_NAME, li_2016);
 	}
 
 	public String getLi_2015() {
@@ -449,24 +403,8 @@ public class CollegeModel extends Model<CollegeModel> {
 	}
 
 	public void setLi_2015(String li_2015) {
-		this.li_2015 = li_2015;
+		set(li_2015_NAME, li_2015);
 	}
-
-	// public String getLi_2014() {
-	// return getStr(li_2014_NAME);
-	// }
-	//
-	// public void setLi_2014(String li_2014) {
-	// this.li_2014 = li_2014;
-	// }
-	//
-	// public String getLi_2013() {
-	// return getStr(li_2013_NAME);
-	// }
-	//
-	// public void setLi_2013(String li_2013) {
-	// this.li_2013 = li_2013;
-	// }
 
 	public boolean isIs211() {
 		if (getCharacteristic() == null) {
