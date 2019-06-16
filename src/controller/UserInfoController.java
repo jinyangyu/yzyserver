@@ -149,14 +149,18 @@ public class UserInfoController extends Controller {
 			logger1.info("user update:" + user.toString());
 			user.update();
 		} else {
-			userinfo.setOpenid(openid);
-			userinfo.setSessionKey(session_key);
-			userinfo.setClientSession(clientSession);
-			userinfo.setTime(TimeUtil.getCurrentTime(TimeUtil.FORMAT_DATE_TIME));
-			userinfo.setScene(scene);
+			if (userinfo == null) {
 
-			logger1.info("user save:" + userinfo.toString());
-			userinfo.save();
+			} else {
+				userinfo.setOpenid(openid);
+				userinfo.setSessionKey(session_key);
+				userinfo.setClientSession(clientSession);
+				userinfo.setTime(TimeUtil.getCurrentTime(TimeUtil.FORMAT_DATE_TIME));
+				userinfo.setScene(scene);
+
+				logger1.info("user save:" + userinfo.toString());
+				userinfo.save();
+			}
 		}
 
 		UserId userId = new UserId();

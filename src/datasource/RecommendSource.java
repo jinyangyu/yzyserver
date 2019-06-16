@@ -1,6 +1,8 @@
 package datasource;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -19,6 +21,7 @@ public class RecommendSource {
 	private static final RecommendSource instance = new RecommendSource();
 
 	private List<LiSchoolScore2018> li2018List;
+	private List<WenSchoolScore2018> wen2018List;
 
 	private List<LiSchoolScore2018> noCollege = new ArrayList<LiSchoolScore2018>();
 	private List<LiSchoolScore2018> errorCollege = new ArrayList<LiSchoolScore2018>();
@@ -94,4 +97,78 @@ public class RecommendSource {
 
 	}
 
+	public void fixWen() {
+		wen2018List = WenSchoolScore2018.dao.find("select * from wen_2018 order by score desc");
+
+		List<CollegeModelAll> allCollege = DataSource.getInstance().getAllColleges();
+		for (CollegeModelAll college : allCollege) {
+			String name = college.getName();
+			int wen_2018 = 0;
+			try {
+				wen_2018 = Integer.parseInt(college.getWen_2018());
+			} catch (Exception e) {
+			}
+
+			if (name.contains("（较高收费）")) {
+				LOGGER.info("name:" + name + " from wen_2018:" + wen_2018);
+				// name = name.substring(0, name.length() - "（较高收费）".length());
+				WenSchoolScore2018 wenSchool = WenSchoolScore2018.dao
+						.findFirst("select * from wen_2018 where name = ? order by score desc", name);
+				college.setWen_2018(wenSchool == null ? "" : String.valueOf(wenSchool.getScore()));
+				college.update();
+				LOGGER.info("name:" + name + " to wen_2018:" + college.getWen_2018());
+			}
+			/*
+			 * if (name.contains("（一本）") && wen_2018 < 547) { LOGGER.info("name:" + name +
+			 * " wen_2018:" + wen_2018); // name = name.substring(0, name.length() -
+			 * "（一本）".length()); // List<WenSchoolScore2018> wenSchools =
+			 * WenSchoolScore2018.dao //
+			 * .find("select * from wen_2018 where name = ? order by score desc", name); //
+			 * for (WenSchoolScore2018 sc : wenSchools) { // fix(college, sc); // } }
+			 * 
+			 * if (name.contains("（二本）") && wen_2018 > 547) { LOGGER.info("name:" + name +
+			 * " wen_2018:" + wen_2018); // name = name.substring(0, name.length() -
+			 * "（一本）".length()); // List<WenSchoolScore2018> wenSchools =
+			 * WenSchoolScore2018.dao //
+			 * .find("select * from wen_2018 where name = ? order by score desc", name); //
+			 * for (WenSchoolScore2018 sc : wenSchools) { // fix(college, sc); // } } if
+			 * (name.contains("（专科）") && wen_2018 > 436) { LOGGER.info("name:" + name +
+			 * " wen_2018:" + wen_2018); // name = name.substring(0, name.length() -
+			 * "（一本）".length()); // List<WenSchoolScore2018> wenSchools =
+			 * WenSchoolScore2018.dao //
+			 * .find("select * from wen_2018 where name = ? order by score desc", name); //
+			 * for (WenSchoolScore2018 sc : wenSchools) { // fix(college, sc); // } }
+			 */
+		}
+	}
+
+	private void fix(CollegeModelAll college, WenSchoolScore2018 wenSchool) {
+		int li_2018 = 0;
+		try {
+			li_2018 = Integer.parseInt(college.getLi_2018());
+		} catch (Exception e) {
+		}
+
+		if (li_2018 >= 499 && wenSchool.getScore() >= 547) {
+			// 一本
+			college.setWen_2018(String.valueOf(wenSchool.getScore()));
+			college.update();
+		}
+		if (li_2018 < 499 && li_2018 > 374 && wenSchool.getScore() < 547 && wenSchool.getScore() > 436) {
+			// 二本
+			college.setWen_2018(String.valueOf(wenSchool.getScore()));
+			college.update();
+		}
+		if (li_2018 < 374 && wenSchool.getScore() < 436) {
+			// 专科
+			college.setWen_2018(String.valueOf(wenSchool.getScore()));
+			college.update();
+		}
+	}
+
+	public static void main(String[] args) {
+		String name = "河南工业大学（专科）";
+		name = name.substring(0, name.length() - "（一本）".length());
+		System.out.println("name:" + name);
+	}
 }

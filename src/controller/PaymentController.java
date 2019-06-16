@@ -30,9 +30,9 @@ public class PaymentController extends Controller {
 	private static final int PAY_FOR_PREPAY = 3; // 39元预支付
 	private UserInfoModel currentUser;
 
-	private static final int MONEY_RECOMMEND = 4900;
+	private static final int MONEY_RECOMMEND = 9900;
 	private static final int MONEY_EXPORT = 698000;
-	private static final int MONEY_PREPAY = 3900;
+	private static final int MONEY_PREPAY = 9900;
 
 	private int fee = MONEY_RECOMMEND;
 

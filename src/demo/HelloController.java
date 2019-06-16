@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -167,9 +169,12 @@ public class HelloController extends Controller {
 				}
 			}
 
-			model.setLi_2015_rank(DataSource.getInstance().get2015RankByScore(li_2015, false));
-			model.setLi_2016_rank(DataSource.getInstance().get2016RankByScore(li_2016, false));
-			model.setLi_2017_rank(DataSource.getInstance().get2017RankByScore(li_2017, false));
+			// model.setLi_2015_rank(DataSource.getInstance().get2015RankByScore(li_2015,
+			// false));
+			// model.setLi_2016_rank(DataSource.getInstance().get2016RankByScore(li_2016,
+			// false));
+			// model.setLi_2017_rank(DataSource.getInstance().get2017RankByScore(li_2017,
+			// false));
 			model.setLi_2018_rank(DataSource.getInstance().get2018RankByScore(li_2018, false));
 
 			int wen_2015 = 0;
@@ -202,9 +207,12 @@ public class HelloController extends Controller {
 				}
 			}
 
-			model.setWen_2015_rank(DataSource.getInstance().get2015RankByScore(wen_2015, true));
-			model.setWen_2016_rank(DataSource.getInstance().get2016RankByScore(wen_2016, true));
-			model.setWen_2017_rank(DataSource.getInstance().get2017RankByScore(wen_2017, true));
+			// model.setWen_2015_rank(DataSource.getInstance().get2015RankByScore(wen_2015,
+			// true));
+			// model.setWen_2016_rank(DataSource.getInstance().get2016RankByScore(wen_2016,
+			// true));
+			// model.setWen_2017_rank(DataSource.getInstance().get2017RankByScore(wen_2017,
+			// true));
 			model.setWen_2018_rank(DataSource.getInstance().get2018RankByScore(wen_2018, true));
 
 			model.update();
@@ -353,6 +361,83 @@ public class HelloController extends Controller {
 	public void newRecommend() {
 		RecommendSource.getInstance().init();
 		renderJson(new Result(ResultCode.SUCCESS, "init", null));
+	}
+
+	public void fixWen() {
+		RecommendSource.getInstance().fixWen();
+	}
+
+	public void userCount() {
+		String nickName = getPara("nickName");
+		try {
+			String nickName1 = new String(nickName.getBytes("UTF-8"), "UTF-8");
+			System.out.println("nickName1:" + nickName1);
+			String nickName2 = new String(nickName.getBytes("GBK"), "UTF-8");
+			System.out.println("nickName2:" + nickName2);
+			String nickName3 = new String(nickName.getBytes("iso-8859-1"), "UTF-8");
+			System.out.println("nickName3:" + nickName3);
+
+			nickName = nickName3;
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
+		System.out.println("nickName:" + nickName);
+		try {
+			nickName = new String(Base64.encodeBase64(nickName.getBytes("UTF-8")), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+
+		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where nickName = ?", nickName);
+
+		if (users == null || users.size() == 0) {
+			renderJson(new Result(ResultCode.SUCCESS, "昵称未查到对应账号，是否改过昵称。请联系管理员", null));
+			return;
+		}
+
+		if (users.size() > 1) {
+			renderJson(new Result(ResultCode.SUCCESS, "昵称对应多个账号，请联系管理员", null));
+			return;
+		}
+
+		UserInfoModel user = users.get(0);
+
+		String openId = user.getOpenid();
+
+		List<QrCodeModel> bindList = QrCodeModel.dao.find("select * from qrcode where shareFrom = ?", openId);
+		if (bindList != null) {
+			int firstCount = bindList.size();
+			int secondCount = 0;
+
+			List<QrCodeModel> qrQueue = new ArrayList<QrCodeModel>();
+			for (QrCodeModel model : bindList) {
+				qrQueue.add(model);
+			}
+
+			while (!qrQueue.isEmpty()) {
+				QrCodeModel model = qrQueue.remove(0);
+				System.out.println("qrQueue size:" + qrQueue.size());
+				List<QrCodeModel> qrlist = QrCodeModel.dao.find("select * from qrcode where shareFrom = ?",
+						model.getOpenid());
+				if (qrlist != null) {
+					System.out.println("二级分享人：" + model.getOpenid() + " 分享：" + qrlist.size());
+					secondCount += qrlist.size();
+					for (QrCodeModel m : qrlist) {
+						qrQueue.add(m);
+					}
+					System.out.println("after add qrQueue size:" + qrQueue.size());
+				}
+			}
+
+			renderHtml(
+					"<h1>一级转发人数:" + firstCount + "</h1>" + 
+					"<h1>二级转发人数:" + secondCount + "</h1>" +
+					"<h1>总转发人数:" + (firstCount + secondCount) + "</h1>"
+					);
+
+			return;
+		}
+		renderJson(new Result(ResultCode.SUCCESS, "尚未转发", null));
+
 	}
 
 }
