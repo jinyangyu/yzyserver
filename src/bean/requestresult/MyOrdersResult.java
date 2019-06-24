@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import bean.dbmodel.YzyOrderModel;
+import controller.PaymentController;
 import util.TimeUtil;
 
 public class MyOrdersResult {
-
-	private static final int RECOMMEND_FEE = 49;
-	private static final int EXPERT_FEE = 6888;
 
 	private List<MyOrder> recommend_orders;
 	private List<MyOrder> expert_orders;
@@ -80,9 +78,9 @@ public class MyOrdersResult {
 
 			this.title = score + " - " + subject + " - " + " 院校推荐查询";
 			if (type == 1) {
-				this.total_fee = RECOMMEND_FEE;
+				this.total_fee = PaymentController.MONEY_RECOMMEND / 100;
 			} else {
-				this.total_fee = EXPERT_FEE;
+				this.total_fee = PaymentController.MONEY_RECOMMEND / 100;
 			}
 
 			try {

@@ -9,6 +9,8 @@ public interface ResultCode {
 	
 	// 现在不能支付
 	int PREPAY_CANNOT_PAY = 502;
+	// 可以预购
+	int PREPAY_CAN_PREPAY = 503;
 	
 	int PARAMS_ERROR = 601;
 	int SIGN_ERROR = 701;

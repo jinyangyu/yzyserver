@@ -11,11 +11,13 @@ import bean.dbmodel.UserInfoModel;
 import bean.dbmodel.WxPayOrderModel;
 import bean.requestinfo.PrepayOrderInfo;
 import bean.requestinfo.PrepayOrderReturnInfo;
+import bean.requestresult.MoneyInfo;
 import bean.requestresult.PrepayResult;
 import bean.requestresult.Result;
 import constant.Configure;
 import constant.ResultCode;
 import datasource.DataSource;
+import datasource.YouHuiDataSource;
 import util.HttpRequest;
 import util.MD5;
 import util.RandomStringGenerator;
@@ -30,25 +32,26 @@ public class PaymentController extends Controller {
 	private static final int PAY_FOR_PREPAY = 3; // 39元预支付
 	private UserInfoModel currentUser;
 
-	private static final int MONEY_RECOMMEND = 9900;
+	public static final int MONEY_RECOMMEND = 9900;
 	private static final int MONEY_EXPORT = 698000;
-	private static final int MONEY_PREPAY = 9900;
+	public static final int MONEY_PREPAY = 9900;
 
 	private int fee = MONEY_RECOMMEND;
 
 	private WxPayOrderModel wxOrderModel;
 
-	//小程序场景值 https://developers.weixin.qq.com/miniprogram/dev/framework/app-service/scene.html
+	// 小程序场景值
+	// https://developers.weixin.qq.com/miniprogram/dev/framework/app-service/scene.html
 	private String scene = "unknown";
 
 	public void recommend() {
 
 		String clientSession = getPara("clientSession");
 		String sceneStr = getPara("scene");
-		if(sceneStr != null && !"".equals(sceneStr)) {
+		if (sceneStr != null && !"".equals(sceneStr)) {
 			scene = sceneStr;
 		}
-		
+
 		logger1.info("clientSession:" + clientSession + " scene:" + scene);
 
 		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where clientSession = ?",
@@ -83,9 +86,6 @@ public class PaymentController extends Controller {
 		if (payType == PAY_FOR_RECOMMEND) {
 			wxOrderModel.setPayTypeRecommend();
 			fee = MONEY_RECOMMEND;
-			if(DataSource.getInstance().isAdmin(currentUser.getOpenid())) {
-				fee = 1;
-			}
 		} else if (payType == PAY_FOR_EXPORT) {
 			wxOrderModel.setPayTypeExpert();
 			fee = MONEY_EXPORT;
@@ -95,6 +95,13 @@ public class PaymentController extends Controller {
 		} else {
 			renderJson(new Result(ResultCode.LOGIN_ERROR, "支付类型参数错误", null));
 			return;
+		}
+
+		if (DataSource.getInstance().isAdmin(currentUser.getOpenid())) {
+			fee = 1;
+		} else {
+			MoneyInfo moneyInfo = YouHuiDataSource.getSharedMoneyInfo(currentUser.getOpenid());
+			fee -= moneyInfo.getCoupon();
 		}
 
 		/*

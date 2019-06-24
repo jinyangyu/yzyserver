@@ -32,6 +32,7 @@ public class ExpertPaySuccessController extends Controller {
 	private static final String PHONE_SHANGHUA = "18595388999";
 	private static final String PHONE_MINGXI = "18639167036";
 	private static final String PHONE_JINYANG = "18210512166";
+	private static final String PHONE_WENJIAN = "15900209307";
 
 	public void order() {
 
@@ -96,18 +97,21 @@ public class ExpertPaySuccessController extends Controller {
 		yzyOrder.save();
 
 		try {
-			SmsUtil.sendSms("SMS_134080035", PHONE_DUWEI,
-					"{\"consignee\":\"" + user.getNickName() + "\", \"number\": \"" + phone + "\"}");
-			logger1.info("!!!!!!!!!!!!!!!=====" + user.getNickName() + " " + phone + " 专家辅导支付成功！！！！！！！！ 发短信提醒杜威！！");
-			SmsUtil.sendSms("SMS_134080035", PHONE_SHANGHUA,
-					"{\"consignee\":\"" + user.getNickName() + "\", \"number\": \"" + phone + "\"}");
-			logger1.info("!!!!!!!!!!!!!!!=====" + user.getNickName() + " " + phone + " 专家辅导支付成功！！！！！！！！ 发短信提醒尚华！！");
+//			SmsUtil.sendSms("SMS_134080035", PHONE_DUWEI,
+//					"{\"consignee\":\"" + user.getNickName() + "\", \"number\": \"" + phone + "\"}");
+//			logger1.info("!!!!!!!!!!!!!!!=====" + user.getNickName() + " " + phone + " 专家辅导支付成功！！！！！！！！ 发短信提醒杜威！！");
+//			SmsUtil.sendSms("SMS_134080035", PHONE_SHANGHUA,
+//					"{\"consignee\":\"" + user.getNickName() + "\", \"number\": \"" + phone + "\"}");
+//			logger1.info("!!!!!!!!!!!!!!!=====" + user.getNickName() + " " + phone + " 专家辅导支付成功！！！！！！！！ 发短信提醒尚华！！");
 			SmsUtil.sendSms("SMS_134080035", PHONE_MINGXI,
 					"{\"consignee\":\"" + user.getNickName() + "\", \"number\": \"" + phone + "\"}");
 			logger1.info("!!!!!!!!!!!!!!!=====" + user.getNickName() + " " + phone + " 专家辅导支付成功！！！！！！！！ 发短信提醒明西！！");
 			SmsUtil.sendSms("SMS_134080035", PHONE_JINYANG,
 					"{\"consignee\":\"" + user.getNickName() + "\", \"number\": \"" + phone + "\"}");
 			logger1.info("!!!!!!!!!!!!!!!=====" + user.getNickName() + " " + phone + " 专家辅导支付成功！！！！！！！！ 发短信提醒金洋！！");
+			SmsUtil.sendSms("SMS_134080035", PHONE_WENJIAN,
+					"{\"consignee\":\"" + user.getNickName() + "\", \"number\": \"" + phone + "\"}");
+			logger1.info("!!!!!!!!!!!!!!!=====" + user.getNickName() + " " + phone + " 专家辅导支付成功！！！！！！！！ 发短信提醒文建！！");
 		} catch (ClientException e) {
 			e.printStackTrace();
 			logger1.error("发送支付成功通知失败,阿里云服务器错误");

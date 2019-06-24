@@ -59,9 +59,15 @@ public class MyOrdersController extends Controller {
 
 		if (prepayCounts == null || prepayCounts.size() < 1) {
 		} else {
-			PrepayCountModel prepayModel = prepayCounts.get(0);
-			result.setTotal_count(prepayModel.getTotalCount());
-			result.setCurrent_count(prepayModel.getCurrentCount());
+			int currentCount = 0;
+			int totalCount = 0;
+			for(PrepayCountModel prepayModel : prepayCounts) {
+				currentCount += prepayModel.getCurrentCount();
+				totalCount += prepayModel.getTotalCount();
+			}
+			
+			result.setTotal_count(totalCount);
+			result.setCurrent_count(currentCount);
 		}
 
 		renderJson(new Result(ResultCode.SUCCESS, "success", result));

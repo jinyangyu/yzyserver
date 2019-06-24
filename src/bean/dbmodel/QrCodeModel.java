@@ -10,12 +10,14 @@ public class QrCodeModel extends Model<QrCodeModel> {
 	private String qrcode;
 	private String sharefrom;
 	private String time;
+	private int used;
 
 	private static final String id_NAME = "id";
 	private static final String openid_NAME = "openid";
 	private static final String qrcode_NAME = "qrcode";
 	private static final String sharefrom_NAME = "sharefrom";
 	private static final String time_NAME = "time";
+	private static final String used_NAME = "used";
 
 	public String getId() {
 		return getStr(id_NAME);
@@ -55,6 +57,14 @@ public class QrCodeModel extends Model<QrCodeModel> {
 
 	public void setSharefrom(String sharefrom) {
 		set(sharefrom_NAME, sharefrom);
+	}
+
+	public int getUsed() {
+		return getInt(used_NAME);
+	}
+
+	public void setUsed(int used) {
+		set(used_NAME, used);
 	}
 
 }
