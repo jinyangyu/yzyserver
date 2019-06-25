@@ -12,7 +12,6 @@ public class YouHuiDataSource {
 		if("oi1oY42G6Y1PRmNmJ_9ErHpkOtKE".equals(openid)) {
 			return 2000;
 		}
-		
 		List<QrCodeModel> list = QrCodeModel.dao.find("select * from qrcode where sharefrom = ? and used=0", openid);
 		int count = list == null ? 0 : list.size();
 		return count;
