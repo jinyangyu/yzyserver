@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -368,40 +369,44 @@ public class HelloController extends Controller {
 	}
 
 	public void userCount() {
-		String nickName = getPara("nickName");
-		try {
-			String nickName1 = new String(nickName.getBytes("UTF-8"), "UTF-8");
-			System.out.println("nickName1:" + nickName1);
-			String nickName2 = new String(nickName.getBytes("GBK"), "UTF-8");
-			System.out.println("nickName2:" + nickName2);
-			String nickName3 = new String(nickName.getBytes("iso-8859-1"), "UTF-8");
-			System.out.println("nickName3:" + nickName3);
+		String openId = getPara("openId");
 
-			nickName = nickName3;
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
+		if (com.alibaba.druid.util.StringUtils.isEmpty(openId)) {
+			String nickName = getPara("nickName");
+			try {
+				String nickName1 = new String(nickName.getBytes("UTF-8"), "UTF-8");
+				System.out.println("nickName1:" + nickName1);
+				String nickName2 = new String(nickName.getBytes("GBK"), "UTF-8");
+				System.out.println("nickName2:" + nickName2);
+				String nickName3 = new String(nickName.getBytes("iso-8859-1"), "UTF-8");
+				System.out.println("nickName3:" + nickName3);
+
+				nickName = nickName3;
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
+			System.out.println("nickName:" + nickName);
+			try {
+				nickName = new String(Base64.encodeBase64(nickName.getBytes("UTF-8")), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+			}
+
+			List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where nickName = ?", nickName);
+
+			if (users == null || users.size() == 0) {
+				renderJson(new Result(ResultCode.SUCCESS, "昵称未查到对应账号，是否改过昵称。请联系管理员", null));
+				return;
+			}
+
+			if (users.size() > 1) {
+				renderJson(new Result(ResultCode.SUCCESS, "昵称对应多个账号，请联系管理员", null));
+				return;
+			}
+
+			UserInfoModel user = users.get(0);
+
+			openId = user.getOpenid();
 		}
-		System.out.println("nickName:" + nickName);
-		try {
-			nickName = new String(Base64.encodeBase64(nickName.getBytes("UTF-8")), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-		}
-
-		List<UserInfoModel> users = UserInfoModel.dao.find("select * from userinfo where nickName = ?", nickName);
-
-		if (users == null || users.size() == 0) {
-			renderJson(new Result(ResultCode.SUCCESS, "昵称未查到对应账号，是否改过昵称。请联系管理员", null));
-			return;
-		}
-
-		if (users.size() > 1) {
-			renderJson(new Result(ResultCode.SUCCESS, "昵称对应多个账号，请联系管理员", null));
-			return;
-		}
-
-		UserInfoModel user = users.get(0);
-
-		String openId = user.getOpenid();
 
 		List<QrCodeModel> bindList = QrCodeModel.dao.find("select * from qrcode where shareFrom = ?", openId);
 		if (bindList != null) {
@@ -415,6 +420,11 @@ public class HelloController extends Controller {
 
 			while (!qrQueue.isEmpty()) {
 				QrCodeModel model = qrQueue.remove(0);
+
+				if (openId.equals(model.getOpenid())) {
+					continue;
+				}
+
 				System.out.println("qrQueue size:" + qrQueue.size());
 				List<QrCodeModel> qrlist = QrCodeModel.dao.find("select * from qrcode where shareFrom = ?",
 						model.getOpenid());
@@ -428,11 +438,8 @@ public class HelloController extends Controller {
 				}
 			}
 
-			renderHtml(
-					"<h1>一级转发人数:" + firstCount + "</h1>" + 
-					"<h1>二级转发人数:" + secondCount + "</h1>" +
-					"<h1>总转发人数:" + (firstCount + secondCount) + "</h1>"
-					);
+			renderHtml("<h1>一级转发人数:" + firstCount + "</h1>" + "<h1>二级转发人数:" + secondCount + "</h1>" + "<h1>总转发人数:"
+					+ (firstCount + secondCount) + "</h1>");
 
 			return;
 		}

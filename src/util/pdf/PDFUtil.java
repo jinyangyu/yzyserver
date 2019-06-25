@@ -275,6 +275,13 @@ public class PDFUtil extends Controller {
 		sb.append("全省排名 &nbsp;&nbsp;</font>");
 
 		sb.append("<font style='color:#111111;font-size:20px;'>");
+		sb.append(DataSource.getInstance().get2019RankByScore(score, isWen));
+		sb.append("</font>");
+		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2019年</font>");
+
+		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+
+		sb.append("<font style='color:#111111;font-size:20px;'>");
 		sb.append(DataSource.getInstance().get2018RankByScore(score, isWen));
 		sb.append("</font>");
 		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2018年</font>");
@@ -285,13 +292,6 @@ public class PDFUtil extends Controller {
 		sb.append(DataSource.getInstance().get2017RankByScore(score, isWen));
 		sb.append("</font>");
 		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2017年</font>");
-
-		sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-
-		sb.append("<font style='color:#111111;font-size:20px;'>");
-		sb.append(DataSource.getInstance().get2016RankByScore(score, isWen));
-		sb.append("</font>");
-		sb.append("<font style='color:#B8B5BD;font-size:20px;'>&nbsp;/&nbsp;2016年</font>");
 
 		sb.append("</div>");
 
@@ -391,11 +391,19 @@ public class PDFUtil extends Controller {
 		sb.append("<font style='color:#B8B5BD;font-size:13px; height:20px;'>历年录取分数线 &nbsp;&nbsp;</font>");
 
 		if (isWen) {
+			if (!"".equals(college.getWen_2018())) {
+				sb.append("<font style='color:#ff4800;font-size:13px;'>");
+				sb.append(college.getWen_2018());
+				sb.append("</font>");
+				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2017年</font>");
+				sb.append("&nbsp;&nbsp;");
+			}
+
 			if (!"".equals(college.getWen_2017())) {
 				sb.append("<font style='color:#ff4800;font-size:13px;'>");
 				sb.append(college.getWen_2017());
 				sb.append("</font>");
-				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2017年</font>");
+				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2016年</font>");
 				sb.append("&nbsp;&nbsp;");
 			}
 
@@ -403,37 +411,29 @@ public class PDFUtil extends Controller {
 				sb.append("<font style='color:#ff4800;font-size:13px;'>");
 				sb.append(college.getWen_2016());
 				sb.append("</font>");
-				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2016年</font>");
-				sb.append("&nbsp;&nbsp;");
-			}
-
-			if (!"".equals(college.getWen_2015())) {
-				sb.append("<font style='color:#ff4800;font-size:13px;'>");
-				sb.append(college.getWen_2015());
-				sb.append("</font>");
 				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2015年</font>");
 				sb.append("&nbsp;&nbsp;");
 			}
 		} else {
+			if (!"".equals(college.getLi_2018())) {
+				sb.append("<font style='color:#ff4800;font-size:13px;'>");
+				sb.append(college.getLi_2018());
+				sb.append("</font>");
+				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2017年</font>");
+				sb.append("&nbsp;&nbsp;");
+			}
+
 			if (!"".equals(college.getLi_2017())) {
 				sb.append("<font style='color:#ff4800;font-size:13px;'>");
 				sb.append(college.getLi_2017());
 				sb.append("</font>");
-				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2017年</font>");
+				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2016年</font>");
 				sb.append("&nbsp;&nbsp;");
 			}
 
 			if (!"".equals(college.getLi_2016())) {
 				sb.append("<font style='color:#ff4800;font-size:13px;'>");
 				sb.append(college.getLi_2016());
-				sb.append("</font>");
-				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2016年</font>");
-				sb.append("&nbsp;&nbsp;");
-			}
-
-			if (!"".equals(college.getLi_2015())) {
-				sb.append("<font style='color:#ff4800;font-size:13px;'>");
-				sb.append(college.getLi_2015());
 				sb.append("</font>");
 				sb.append("<font style='color:#B8B5BD;font-size:13px;'>/2015年</font>");
 				sb.append("&nbsp;&nbsp;");

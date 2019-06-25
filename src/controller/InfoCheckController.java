@@ -48,6 +48,10 @@ public class InfoCheckController extends Controller {
 			String page1_config = info.getPage1_config();
 			String page2_config = info.getPage2_config();
 			String shareTip = info.getShareTip();
+			
+			if("true".equals(getPara("test"))) {
+				page1_config = "{\"pay_switcher\":true}";
+			}
 
 			if (hasphone == 1) {
 				String[] phones = phone_num.split(";");
@@ -64,6 +68,7 @@ public class InfoCheckController extends Controller {
 			}
 
 			int shareCount = YouHuiDataSource.getShareCount(currentUser.getOpenid());
+			shareCount *= 5;
 
 			logger1.info("title:" + title + "content:" + content + "button_text:" + button_text + "hasphone:" + hasphone
 					+ "phone_num:" + phone_num + " shareCount:" + shareCount + " shareTip:" + shareTip);

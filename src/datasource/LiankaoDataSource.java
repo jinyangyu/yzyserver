@@ -123,7 +123,13 @@ public class LiankaoDataSource {
 		}
 
 		System.out.println("联考在学校里的排名:" + liankaoRank);
-		int lastYearRank = scoreRanks.get(liankaoRank);
+		
+		Integer lastYearRankObject = scoreRanks.get(liankaoRank);
+		while(lastYearRankObject == null) {
+			lastYearRankObject = scoreRanks.get(--liankaoRank);
+		}
+		
+		int lastYearRank = lastYearRankObject;
 		System.out.println("学校排名对应去年高考排名:" + lastYearRank);
 
 		return DataSource.getInstance().get2018ScoreByIndex(lastYearRank, isWen);

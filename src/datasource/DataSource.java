@@ -23,6 +23,9 @@ public class DataSource {
 	private List<CollegeModelAll> henanColleges_wen;
 	private List<CollegeModelAll> henanColleges_li;
 
+	private List<ScoreRankModel> li_2019_ScoreRanks;
+	private List<ScoreRankModel> wen_2019_ScoreRanks;
+	
 	private List<ScoreRankModel> li_2018_ScoreRanks;
 	private List<ScoreRankModel> wen_2018_ScoreRanks;
 
@@ -56,6 +59,11 @@ public class DataSource {
 
 		logger1.info("DataSource init colleges use:" + (System.currentTimeMillis() - start) + " ms");
 
+		li_2019_ScoreRanks = ScoreRankModel.dao
+				.find("select * from scores where year=2019 and wenli=? order by score desc", "li");
+		wen_2019_ScoreRanks = ScoreRankModel.dao
+				.find("select * from scores where year=2019 and wenli=? order by score desc", "wen");
+		
 		li_2018_ScoreRanks = ScoreRankModel.dao
 				.find("select * from scores where year=2018 and wenli=? order by score desc", "li");
 		wen_2018_ScoreRanks = ScoreRankModel.dao
@@ -87,7 +95,7 @@ public class DataSource {
 		Collections.sort(allColleges, wenComp);
 		recommendSource_wen.setCollege(allColleges);
 
-		logger1.info("DataSource init colleges sort by li_2017 use:" + (System.currentTimeMillis() - start) + " ms");
+		logger1.info("DataSource init colleges sort by li_2018 use:" + (System.currentTimeMillis() - start) + " ms");
 
 		initHenanCollege();
 
@@ -188,11 +196,11 @@ public class DataSource {
 	}
 
 	/*
-	 * 根据当年排名，查询去年（2017）年该排名对应的分数 以去年对应的分数查询相应推荐院校
+	 * 根据当年排名，查询去年（2018）年该排名对应的分数 以去年对应的分数查询相应推荐院校
 	 */
 	public int getRecommendScore(int score, boolean isWen) {
 
-		int rank = get2018RankByScore(score, isWen);
+		int rank = get2019RankByScore(score, isWen);
 		logger1.info("recommendCollege score To rank:" + rank);
 
 		List<ScoreRankModel> scores;
@@ -207,6 +215,22 @@ public class DataSource {
 			}
 		}
 		return score;
+	}
+	
+	/*
+	 * 通过当年分数，查询当年排名
+	 */
+	public int get2019RankByScore(int score, boolean isWen) {
+
+		List<ScoreRankModel> scores;
+		scores = isWen ? wen_2019_ScoreRanks : li_2019_ScoreRanks;
+
+		for (ScoreRankModel rank : scores) {
+			if (rank.getScore() <= score) {
+				return rank.getCount();
+			}
+		}
+		return -1;
 	}
 
 	/*

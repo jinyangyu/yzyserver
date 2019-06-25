@@ -125,16 +125,26 @@ public class CollegeRecommendController extends Controller {
 			List<YzyOrderModel> yzyOrders = YzyOrderModel.dao.find(
 					"select * from orders_yzy where out_trade_no = ? and type = 1 and openid = ?", out_trade_no,
 					user.getOpenid());
-			if (yzyOrders != null && yzyOrders.size() != 0 && yzyOrders.get(0).getOut_trade_no() != null
-					&& !"".equals(yzyOrders.get(0).getOut_trade_no()) && score == yzyOrders.get(0).getScore()
-					&& subject.equals(yzyOrders.get(0).getSubject())) {
-				// 2、检查订单数据，如果是已存在完成的订单，则直接查询。
-				logger1.info("已存在完成的订单，直接查询");
-				doRecommendByScore(score, isWen);
+			
+			boolean startRecommend = false;
+			if (yzyOrders != null && yzyOrders.size() != 0) {
+				for (int i = 0; i < yzyOrders.size(); i++) {
+					YzyOrderModel order = yzyOrders.get(i);
+					if (order.getOut_trade_no() != null && !"".equals(order.getOut_trade_no())
+							&& score == order.getScore() && subject.equals(order.getSubject())) {
+						// 2、检查订单数据，如果是已存在完成的订单，则直接查询。
+						logger1.info("已存在完成的订单，直接查询");
+						
+						startRecommend = true;
+						doRecommendByScore(score, isWen);
 
-				yzyOrders.get(0).setTime(String.valueOf(System.currentTimeMillis()));
-				yzyOrders.get(0).update();
-			} else { // 1、新订单，检查支付结果
+						yzyOrders.get(0).setTime(String.valueOf(System.currentTimeMillis()));
+						yzyOrders.get(0).update();
+						break;
+					}
+				}
+			} 
+			if(!startRecommend) { // 1、新订单，检查支付结果
 				logger1.info("新查询订单，开始检查支付结果");
 				startRecommendByCheckWxOrder(out_trade_no, user, score, isWen);
 			}
@@ -426,12 +436,12 @@ public class CollegeRecommendController extends Controller {
 
 		if (!colleges_all.isEmpty()) {
 			List<RankResult> ranks = new ArrayList<RankResult>();
-			ranks.add(new RankResult("2018",
-					String.valueOf(DataSource.getInstance().get2018RankByScore(score, isWen))));
-			ranks.add(new RankResult("2017",
-					String.valueOf(DataSource.getInstance().get2017RankByScore(score, isWen))));
-			ranks.add(new RankResult("2016",
-					String.valueOf(DataSource.getInstance().get2016RankByScore(score, isWen))));
+			ranks.add(
+					new RankResult("2019", String.valueOf(DataSource.getInstance().get2019RankByScore(score, isWen))));
+			ranks.add(
+					new RankResult("2018", String.valueOf(DataSource.getInstance().get2018RankByScore(score, isWen))));
+			ranks.add(
+					new RankResult("2017", String.valueOf(DataSource.getInstance().get2017RankByScore(score, isWen))));
 			collegeResult.setRanks(ranks);
 		}
 

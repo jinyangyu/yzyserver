@@ -10,6 +10,7 @@ import com.thoughtworks.xstream.XStream;
 import bean.dbmodel.PrepayCountModel;
 import bean.dbmodel.WxPayOrderModel;
 import bean.requestinfo.WxPayResultInfo;
+import datasource.YouHuiDataSource;
 import util.Signature;
 import util.StreamUtil;
 
@@ -109,6 +110,9 @@ public class WXPayResultController extends Controller {
 			if ("PREPAY".equals(order.getPayType())) {
 				updatePrepayCount(order.getOpenid(), order.getOut_trade_no(), order.getExtra());
 			}
+			
+			// 支付成功，扣除已经用过的优惠券。
+			YouHuiDataSource.dissShareCount(order.getOpenid());
 		}
 
 		renderText("<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>");
